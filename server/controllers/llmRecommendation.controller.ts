@@ -1,12 +1,6 @@
 import { Request, Response } from 'express';
 import OpenAI from 'openai';
 
-// Initialize the OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  timeout: 15 * 1000, // 15 second timeout
-});
-
 // Type definitions for the incoming request query parameters
 interface MovieQuery {
   movie?: string;
@@ -51,6 +45,11 @@ export const getLlmRecommendations = async (
       });
       return;
     }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      timeout: 15 * 1000,
+    });
 
     // system prompt
     const systemPrompt = `

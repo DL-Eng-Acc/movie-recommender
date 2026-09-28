@@ -1,14 +1,14 @@
 import express from "express";
 import cors from "cors";
-import { fileURLToPath } from "node:url";
-import path from "node:path"
 import dotenv from "dotenv";
-import movieRoutes from "./routes/movies.routes.js";
-import llmRecommendationRoutes from "./routes/llmRecommendation.routes";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 dotenv.config({ path: __dirname + "/../.env" });
+
+import movieRoutes from "./routes/movies.routes.js";
+import llmRecommendationRoutes from "./routes/llmRecommendation.routes";
 
 const app = express();
 app.disable("x-powered-by");
