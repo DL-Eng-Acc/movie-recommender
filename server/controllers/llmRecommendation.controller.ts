@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 // Initialize the OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  timeout: 15 * 1000, // 15 second timeout
 });
 
 // Type definitions for the incoming request query parameters
@@ -65,7 +66,7 @@ You are a movie recommendation system. Given a movie title and its release year,
 
     // Make API call to OpenAI
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', //replace with correct model
+      model: 'gpt-5-nano',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },

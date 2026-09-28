@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path"
 import dotenv from "dotenv";
 import movieRoutes from "./routes/movies.routes.js";
+import llmRecommendationRoutes from "./routes/llmRecommendation.routes";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,6 +19,8 @@ app.use(express.json());
 
 // Routes
 app.use("/api/movies", movieRoutes);
+
+app.use("/api/llm-recommender", llmRecommendationRoutes);
 
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 
