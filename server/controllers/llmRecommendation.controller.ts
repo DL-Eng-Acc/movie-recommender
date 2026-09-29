@@ -49,7 +49,7 @@ export const getLlmRecommendations = async (
 
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-      timeout: 15 * 1000,
+      timeout: 30 * 1000,
     });
 
     // system prompt
@@ -72,7 +72,6 @@ You are a movie recommendation system. Given a movie title and its release year,
         { role: 'user', content: userPrompt },
       ],
       response_format: { type: 'json_object' },
-      temperature: 0.4,
     });
 
     const rawContent = completion.choices[0]?.message?.content;
