@@ -93,7 +93,6 @@ You are a movie recommendation system. Given a movie title and its release year,
       data: parsedData,
     });
   } catch (error) {
-    console.error('Error fetching OpenAI recommendations:', error);
     res.status(500).json({
       error: 'An internal server error occurred while processing your request.',
       message: error instanceof Error ? error.message : String(error),
