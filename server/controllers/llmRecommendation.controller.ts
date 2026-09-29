@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { enrichMoviesWithImages } from '../services/tmdb.services';
 import OpenAI from 'openai';
 
 // Type definitions for the incoming request query parameters
@@ -83,6 +84,9 @@ You are a movie recommendation system. Given a movie title and its release year,
     // Parse structured JSON response
     const parsedData: OpenAIRecommendationPayload = JSON.parse(rawContent);
 
+    // enrich with image URLs from TMDB
+    const enrichedMovies = await enrichMoviesWithImages(parsedData.recommendations);
+
     // Return structured recommendation data
     res.status(200).json({
       success: true,
@@ -90,7 +94,10 @@ You are a movie recommendation system. Given a movie title and its release year,
         title: movie,
         releaseYear: yearParsed,
       },
-      data: parsedData,
+      data: {
+        userInterestSummary: parsedData.userInterestSummary,
+        recommendations: enrichedMovies,
+      },
     });
   } catch (error) {
     res.status(500).json({

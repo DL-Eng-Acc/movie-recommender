@@ -36,6 +36,7 @@ describe('GET /api/llm-recommender', () => {
           title: 'Blade Runner 2049',
           releaseYear: 2017,
           justification: 'Matches visual atmosphere and sci-fi genre.',
+          imageUrl: null,
         },
       ],
     };
