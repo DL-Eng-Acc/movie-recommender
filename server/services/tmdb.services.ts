@@ -3,12 +3,12 @@ export interface RecommendedMovie {
   releaseYear: number | string;
   justification: string;
   imageUrl?: string | null;
+  movieId?: string;
 }
 
 interface TmdbMovieResult {
   poster_path: string | null;
-  title: string;
-  release_date?: string;
+  id: number;
 }
 
 interface TmdbSearchResponse {
@@ -26,7 +26,7 @@ export const enrichMoviesWithImages = async (
 
   if (!tmdbApiKey) {
     console.warn('VITE_TMDB_API_KEY is missing from environment variables.');
-    return movies.map((movie) => ({ ...movie, imageUrl: null }));
+    return movies.map((movie) => ({ ...movie, imageUrl: null, movieId: '' }));
   }
 
   const enrichedMovies = await Promise.all(
@@ -46,7 +46,7 @@ export const enrichMoviesWithImages = async (
         const response = await fetch(searchUrl.toString());
 
         if (!response.ok) {
-          return { ...movie, imageUrl: null };
+          return { ...movie, imageUrl: null, movieId: '' };
         }
 
         const data = (await response.json()) as TmdbSearchResponse;
@@ -57,13 +57,16 @@ export const enrichMoviesWithImages = async (
           ? `https://image.tmdb.org/t/p/w500${topResult.poster_path}`
           : null;
 
+        const movieId = topResult?.id ? String(topResult.id) : '';
+
         return {
           ...movie,
           imageUrl,
+          movieId,
         };
       } catch (error) {
         console.error(`Failed to fetch TMDB image for "${movie.title}":`, error);
-        return { ...movie, imageUrl: null };
+        return { ...movie, imageUrl: null, movieId: '' };
       }
     })
   );

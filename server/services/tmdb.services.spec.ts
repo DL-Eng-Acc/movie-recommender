@@ -33,7 +33,7 @@ describe('enrichMoviesWithImages Service', () => {
         .mockResolvedValueOnce(
           new Response(
             JSON.stringify({
-              results: [{ poster_path: '/inception-poster.jpg' }],
+              results: [{ poster_path: '/inception-poster.jpg', id: 603 }],
             }),
             { status: 200 }
           )
@@ -41,7 +41,7 @@ describe('enrichMoviesWithImages Service', () => {
         .mockResolvedValueOnce(
           new Response(
             JSON.stringify({
-              results: [{ poster_path: '/interstellar-poster.jpg' }],
+              results: [{ poster_path: '/interstellar-poster.jpg', id: 157336 }],
             }),
             { status: 200 }
           )
@@ -67,12 +67,14 @@ describe('enrichMoviesWithImages Service', () => {
           releaseYear: 2010,
           justification: 'Mind-bending sci-fi thriller.',
           imageUrl: 'https://image.tmdb.org/t/p/w500/inception-poster.jpg',
+          movieId: '603'
         },
         {
           title: 'Interstellar',
           releaseYear: 2014,
           justification: 'Epic space exploration.',
           imageUrl: 'https://image.tmdb.org/t/p/w500/interstellar-poster.jpg',
+          movieId: '157336'
         },
       ]);
     });
@@ -110,8 +112,8 @@ describe('enrichMoviesWithImages Service', () => {
 
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(result).toEqual([
-        { ...mockMovies[0], imageUrl: null },
-        { ...mockMovies[1], imageUrl: null },
+        { ...mockMovies[0], imageUrl: null, movieId: "" },
+        { ...mockMovies[1], imageUrl: null, movieId: "" },
       ]);
     });
 

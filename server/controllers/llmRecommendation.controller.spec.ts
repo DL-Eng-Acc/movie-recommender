@@ -82,18 +82,21 @@ describe('getLlmRecommendations Controller', () => {
             releaseYear: 2014,
             justification: 'Shares theme of deep human emotion within high-concept sci-fi.',
             imageUrl: null,
+            movieId: ''
           },
           {
             title: 'Shutter Island',
             releaseYear: 2010,
             justification: 'Directed by Christopher Nolan style psychological depth.',
             imageUrl: null,
+            movieId: ''
           },
           {
             title: 'The Matrix',
             releaseYear: 1999,
             justification: 'Features reality-bending mechanics and philosophical themes.',
             imageUrl: null,
+            movieId: ''
           },
         ],
       };
