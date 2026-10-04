@@ -6,6 +6,7 @@ server/node_modules/
 # Environment
 .env
 .env.local
+atlas-credentials.env
 
 # Build
 client/dist/
@@ -17,3 +18,6 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Notes
+PROJECT_GUIDE.md

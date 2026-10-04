@@ -46,6 +46,8 @@ The frontend server will be open on `localhost:5173` by default, while the backe
 ## Learn More
 If you want to contribute or learn more about the project, please consider viewing the [Contributor Guidelines](CONTRIBUTING.md).
 
+For an explanation of the application flow and the responsibilities of its components and modules, see the [Project Guide](PROJECT_GUIDE.md).
+
 You may also wish to view our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Contact
