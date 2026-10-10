@@ -1,11 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
-import express from "express";
-import router from "./movies.routes.js";
+import { createApp } from "../app.js";
 
-const app = express();
-app.use(express.json());
-app.use("/api/movies", router);
+const app = createApp();
 
 describe("api/random route", () => {
   beforeEach(() => {
