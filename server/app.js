@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import movieRoutes from "./routes/movies.routes.js";
 
 export function createApp(
@@ -12,7 +13,15 @@ export function createApp(
   app.use(express.json());
 
   app.use("/api/movies", movieRoutes);
-  app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
+  app.get("/api/health", (_req, res) => {
+    const isDatabaseReady = mongoose.connection.readyState === 1;
+    const status = isDatabaseReady ? "ok" : "unavailable";
+
+    res.status(isDatabaseReady ? 200 : 503).json({
+      status,
+      database: isDatabaseReady ? "connected" : "disconnected",
+    });
+  });
 
   return app;
 }
