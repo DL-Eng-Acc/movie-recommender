@@ -77,6 +77,8 @@ Integration testing should be done in a more practical environment, e.g. testing
 
 In the case where a component needs to interact with the backend, this is currently mocked by MSW. in `client/src/test/handlers.ts`, there is a list of handlers; when a handler link is called, a mocked `HttpResponse` will be returned, allowing for mocking external api/backend calls.
 
+Some code waits before acting, such as the debounce on the search input. Don't wait for these delays in real time (with `setTimeout` or a longer `findBy*` timeout), because the test can fail on a slow or busy machine. Instead, call `vi.useFakeTimers({ shouldAdvanceTime: true })` and advance the clock by the delays in `client/src/constants/debounce.ts`, wrapping each advance in `act()`. `client/src/App.spec.tsx` shows the pattern.
+
 While frontend testing can confirm the logic of the DOM state e.g. what classes a component has, what text is displayed, it is unable to test direct visual state, e.g. responsiveness, component alignment, etc. This is more suitable to tools such as Playwright, which currently is not implemented, with no immediate plans of doing so.
 
 ### Backend
