@@ -37,12 +37,26 @@ Before making a pull request, ensure that:
 - Your branch is up to date with to the latest version of the main repo
 - The project can run without errors or crashes
 - All test cases (new and existing) pass - see below on **Creating Tests**.
+- The frontend type-checks and lints without errors - see below on **Frontend Type Checking and Linting**.
 
 When submitting a pull request, there will be a preset template to fill out, including a checklist of all of the prerequisites before submitting the pull request. The other important section is linking your PR to the issue your PR closes, using closing keywords.
 
 After submitting, a team member will review your work, possibly request changes, and approve your PR. Your PR should then be (if you are merging) squash merged into the `main` branch.
 
 Congratulations! You have successfully contributed to the `movie-recommender` project!
+
+## Frontend Type Checking and Linting
+The client uses strict TypeScript (`strict`, `noUncheckedIndexedAccess` and `noImplicitReturns` in `client/tsconfig.app.json`) and is linted with [oxlint](https://oxc.rs/docs/guide/usage/linter.html). The lint includes type-aware rules that reject `any` values and unhandled promises. CI runs both on every pull request, and you can run them from `client/`:
+```
+npm run typecheck
+npm run lint
+```
+
+These conventions keep both passing:
+- Request TMDB data through the functions in `client/src/api/`, which use `tmdbGet` and the response types in `client/src/types/tmdb.ts`, instead of calling `fetch` in a component.
+- Treat values read from storage, `JSON.parse` or form inputs as `unknown` and check them before use (see `client/src/utils/searchStorage.ts`), instead of casting with `as`.
+- Indexing an array gives `T | undefined`, so handle the `undefined` case (or use `?.`) instead of adding `!`.
+- If you don't want to wait for a promise, such as `navigate()` in a click handler, mark it with `void`.
 
 ## Creating Tests
 `vitest` is used for all test cases, and roughly follows the below structure:
