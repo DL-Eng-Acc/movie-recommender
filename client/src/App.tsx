@@ -8,64 +8,20 @@ import { useMovieResults } from "./hooks/useMovieResults.ts";
 import type { Movie } from "./types/movie.ts";
 import type { DiscoverFilters } from "./api/discoverMovies";
 import RandomButton from "./components/RandomButton.tsx";
+import { CURRENT_YEAR, MIN_YEAR } from "./constants/filters";
+import {
+  readStoredFilters,
+  readStoredQuery,
+  writeStoredFilters,
+  writeStoredQuery,
+} from "./utils/searchStorage";
 
 function App() {
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
-  const [query, setQuery] = useState<string>(() => {
-    const savedQuery = sessionStorage.getItem("movieSearchQuery");
-    if (!savedQuery) {
-      return "";
-    }
-
-    try {
-      const parsed = JSON.parse(savedQuery);
-
-      if (typeof parsed === "string" && /^[^<>]*$/.test(parsed)) {
-        return parsed;
-      }
-      return "";
-    } catch {
-      return "";
-    }
-  });
-
-  const [filters, setFilters] = useState<DiscoverFilters>(() => {
-    const savedFilters = sessionStorage.getItem("movieSearchFilters");
-    if (!savedFilters) {
-      return {};
-    }
-
-    try {
-      const parsed = JSON.parse(savedFilters);
-      const safeFilters: DiscoverFilters = {};
-
-      if (typeof parsed.genre === "number") {
-        safeFilters.genre = parsed.genre;
-      }
-      if (typeof parsed.yearFrom === "number") {
-        safeFilters.yearFrom = parsed.yearFrom;
-      }
-      if (typeof parsed.yearTo === "number") {
-        safeFilters.yearTo = parsed.yearTo;
-      }
-      if (typeof parsed.ratingMin === "number") {
-        safeFilters.ratingMin = parsed.ratingMin;
-      }
-      if (typeof parsed.castId === "number") {
-        safeFilters.castId = parsed.castId;
-      }
-
-      if (["popularity", "rating", "release_date"].includes(parsed.sort)) {
-        safeFilters.sort = parsed.sort;
-      }
-
-      return safeFilters;
-    } catch {
-      return {};
-    }
-  });
+  const [query, setQuery] = useState<string>(() => readStoredQuery());
+  const [filters, setFilters] = useState<DiscoverFilters>(() => readStoredFilters());
 
   const { movies, isLoading, hasSearched, hasMore, loadMore } = useMovieResults(
     query,
@@ -73,26 +29,23 @@ function App() {
   );
 
   useEffect(() => {
-    if (/^[^<>]*$/.test(query)) {
-      sessionStorage.setItem("movieSearchQuery", JSON.stringify(query));
-    }
+    writeStoredQuery(query);
   }, [query]);
 
   useEffect(() => {
-    sessionStorage.setItem("movieSearchFilters", JSON.stringify(filters));
+    writeStoredFilters(filters);
   }, [filters]);
 
   const handleMovieClick = (movie: Movie) => {
-    navigate(`/movie/${movie.id}`);
+    void navigate(`/movie/${movie.id}`);
   };
 
   const hasActiveFilters =
     filters.genre !== undefined ||
     filters.ratingMin !== undefined ||
     filters.castId !== undefined ||
-    (filters.yearFrom !== undefined && filters.yearFrom !== 1900) ||
-    (filters.yearTo !== undefined &&
-      filters.yearTo !== new Date().getFullYear());
+    (filters.yearFrom !== undefined && filters.yearFrom !== MIN_YEAR) ||
+    (filters.yearTo !== undefined && filters.yearTo !== CURRENT_YEAR);
 
   return (
     <section id="search-page">
