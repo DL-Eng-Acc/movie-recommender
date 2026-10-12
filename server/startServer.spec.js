@@ -39,9 +39,27 @@ describe("startServer", () => {
     const appFactory = vi.fn();
 
     await expect(
-      startServer({ databaseConnector, appFactory }),
+      startServer({ databaseConnector, appFactory, allowDatabaseUnavailable: false }),
     ).rejects.toBe(databaseError);
 
     expect(appFactory).not.toHaveBeenCalled();
+  });
+
+  it("starts in degraded mode when MongoDB is unavailable outside production", async () => {
+    const databaseConnector = vi.fn().mockRejectedValue(new Error("Database unavailable"));
+    const server = {};
+    const listen = vi.fn(() => server);
+    const appFactory = vi.fn(() => ({ listen }));
+    const logger = { log: vi.fn(), warn: vi.fn() };
+
+    await expect(
+      startServer({ databaseConnector, appFactory, logger, allowDatabaseUnavailable: true }),
+    ).resolves.toBe(server);
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      "MongoDB is unavailable; starting in degraded mode:",
+      "Database unavailable",
+    );
+    expect(listen).toHaveBeenCalledOnce();
   });
 });
