@@ -26,11 +26,15 @@ npm run install:all
 ### Setting up `.env`
 
 Because the website uses TMDB, you must have an API Key for API Read Access Token for TMDB.
+The website uses mongoDB for user profiles, and rerquires both login credentials and for your current IP address to be whitelisted. Please get in contact on discord or at swal289@aucklandduni.ac.nz
 The `.env` should located in the project root, and may look like this once completed:
 ```
 VITE_TMDB_API_KEY=someApiKeyHere
 VITE_FRONTEND_PORT=5173
 BACKEND_PORT=5000
+MONGODB_USERNAME="user"
+MONGODB_PASSWORD="password"
+MONGODB_URI="uri"
 ```
 
 ### Running the Website
