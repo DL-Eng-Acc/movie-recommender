@@ -9,7 +9,7 @@ export default function RandomButton() {
     const getRandom = async () => {
         try {
             setButtonName("Generating...")
-            const movieData = await apiFetch("/movies/random");
+            const movieData = await apiFetch<{ id: string }>("/movies/random");
             setButtonName("Generated!")
             // causes redirect (go to movie page)
             navigate(`/movie/${movieData.id}`)

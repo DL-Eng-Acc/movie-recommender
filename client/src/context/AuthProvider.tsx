@@ -40,7 +40,7 @@ export function AuthProvider({
       }
     }
 
-    restoreSession();
+    void restoreSession();
 
     return () => {
       isMounted = false;
