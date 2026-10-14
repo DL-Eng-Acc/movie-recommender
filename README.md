@@ -35,6 +35,7 @@ BACKEND_PORT=5000
 MONGODB_USERNAME="user"
 MONGODB_PASSWORD="password"
 MONGODB_URI="uri"
+SESSION_SECRET="replace-with-a-long-random-secret"
 ```
 
 ### Running the Website
