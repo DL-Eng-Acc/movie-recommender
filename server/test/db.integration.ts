@@ -1,15 +1,16 @@
+// Live MongoDB check, run with `npm run test:db`; not a spec file, so Vitest skips it
 import assert from "node:assert/strict";
+import path from "node:path";
 import { after, before, test } from "node:test";
-import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import { connectDatabase } from "./config/config.js";
+import { connectDatabase } from "../src/db.js";
 
-dotenv.config({ path: fileURLToPath(new URL("../.env", import.meta.url)) });
+dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
 
 before(async () => {
   assert.ok(process.env.MONGODB_URI, "MONGODB_URI must be configured in the root .env file");
-  await connectDatabase();
+  await connectDatabase(process.env.MONGODB_URI);
 });
 
 after(async () => {
@@ -24,7 +25,9 @@ test("connects to MongoDB", () => {
 });
 
 test("MongoDB responds to an admin ping", async () => {
-  const response = await mongoose.connection.db.admin().ping();
+  const db = mongoose.connection.db;
+  assert.ok(db);
+  const response = await db.admin().ping();
 
   assert.equal(response.ok, 1);
 });
