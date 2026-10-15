@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { EMAIL_PATTERN } from "../validation/email.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,7 +18,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
       maxlength: 254,
-      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      match: EMAIL_PATTERN,
     },
     passwordHash: {
       type: String,

@@ -86,6 +86,22 @@ describe("authentication routes", () => {
     expect(mocks.userCreate).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ".first@example.com",
+    "first..last@example.com",
+    "first@example..com",
+    `${"a".repeat(255)}@example.com`,
+  ])("rejects malformed or oversized email %s", async (email) => {
+    const response = await request(app).post("/api/auth/signup").send({
+      username: "film_fan",
+      email,
+      password: "long-password",
+    });
+
+    expect(response.status).toBe(400);
+    expect(mocks.userCreate).not.toHaveBeenCalled();
+  });
+
   it("returns conflict when a username or email is already registered", async () => {
     mocks.passwordHash.mockResolvedValue("stored-hash");
     mocks.userCreate.mockRejectedValue({ code: 11000 });

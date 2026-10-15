@@ -13,6 +13,34 @@ describe("User model", () => {
     expect(user.email).toBe("film@example.com");
   });
 
+  it("accepts common email syntax and rejects malformed dot placement", async () => {
+    const validUser = new User({
+      username: "film_fan",
+      email: "first.last+tag@sub-domain.example",
+      passwordHash: "hashed-password",
+    });
+    await expect(validUser.validate()).resolves.toBeUndefined();
+
+    for (const email of [
+      ".first@example.com",
+      "first..last@example.com",
+      "first.@example.com",
+      "first@-example.com",
+      "first@example-.com",
+      "first@example..com",
+      `${"a".repeat(65)}@example.com`,
+    ]) {
+      const user = new User({
+        username: "film_fan",
+        email,
+        passwordHash: "hashed-password",
+      });
+      await expect(user.validate()).rejects.toMatchObject({
+        errors: { email: expect.anything() },
+      });
+    }
+  });
+
   it("requires username, email, and password hash", async () => {
     const user = new User();
 

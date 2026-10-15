@@ -2,12 +2,12 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { User } from "../models/User.js";
 import { SESSION_COOKIE_NAME } from "../auth/session.js";
+import { EMAIL_PATTERN } from "../validation/email.js";
 
 const BCRYPT_ROUNDS = 12;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_BYTES = 72;
 const USERNAME_PATTERN = /^[a-z0-9_.-]{3,30}$/;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function publicUser(user) {
   return {
@@ -21,7 +21,11 @@ function validateSignUp({ username, email, password }) {
   if (typeof username !== "string" || !USERNAME_PATTERN.test(username.trim().toLowerCase())) {
     return "Username must be 3-30 characters using letters, numbers, dots, underscores, or hyphens";
   }
-  if (typeof email !== "string" || email.length > 254 || !EMAIL_PATTERN.test(email.trim())) {
+  if (typeof email !== "string") {
+    return "A valid email address is required";
+  }
+  const normalizedEmail = email.trim();
+  if (normalizedEmail.length > 254 || !EMAIL_PATTERN.test(normalizedEmail)) {
     return "A valid email address is required";
   }
   if (
