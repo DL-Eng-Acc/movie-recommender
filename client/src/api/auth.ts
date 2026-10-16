@@ -6,7 +6,7 @@ interface CurrentUserResponse {
 }
 
 export async function getCurrentUser(): Promise<User | null> {
-  const response = await apiFetch<CurrentUserResponse>("/users/me");
+  const response = await apiFetch<CurrentUserResponse>("/auth/me");
 
   return response.user;
 }

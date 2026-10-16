@@ -18,7 +18,7 @@ describe("authentication API", () => {
     let credentials: RequestCredentials | undefined;
 
     server.use(
-      http.get(`${BASE_URL}/users/me`, ({ request }) => {
+      http.get(`${BASE_URL}/auth/me`, ({ request }) => {
         credentials = request.credentials;
         return HttpResponse.json({ user: testUser });
       }),
@@ -30,7 +30,7 @@ describe("authentication API", () => {
 
   it("returns null when the session response contains no user", async () => {
     server.use(
-      http.get(`${BASE_URL}/users/me`, () =>
+      http.get(`${BASE_URL}/auth/me`, () =>
         HttpResponse.json({ user: null }),
       ),
     );
@@ -40,7 +40,7 @@ describe("authentication API", () => {
 
   it("propagates session request failures", async () => {
     server.use(
-      http.get(`${BASE_URL}/users/me`, () =>
+      http.get(`${BASE_URL}/auth/me`, () =>
         HttpResponse.json(
           { message: "Session unavailable" },
           { status: 503 },
