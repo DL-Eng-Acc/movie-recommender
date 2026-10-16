@@ -2,7 +2,6 @@ import type { Request, Response } from 'express';
 import OpenAI from 'openai';
 import type { AppConfig } from '../config.js';
 import { enrichMoviesWithImages, type RecommendedMovie } from '../services/tmdb.services.js';
-import { error } from 'node:console';
 
 // Type definitions for the incoming request query parameters
 export interface MovieQuery {
