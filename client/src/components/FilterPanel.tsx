@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { MOVIE_GENRES } from "../constants/genres";
-<<<<<<< HEAD
 import { CURRENT_YEAR, MIN_YEAR } from "../constants/filters";
-=======
 import { MOVIE_LANGUAGES } from "../constants/languages";
->>>>>>> d312a71 (add language filter option to FilterPanel)
 import { searchPerson, type Person } from "../api/searchPerson";
 import { isSortOption, type DiscoverFilters, type SortOption } from "../api/discoverMovies";
 import "./FilterPanel.css";

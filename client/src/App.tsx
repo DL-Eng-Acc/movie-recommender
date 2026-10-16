@@ -10,8 +10,6 @@ import type { DiscoverFilters } from "./api/discoverMovies";
 import RandomButton from "./components/RandomButton.tsx";
 import { CURRENT_YEAR, MIN_YEAR } from "./constants/filters";
 import {
-  readStoredFilters,
-  readStoredQuery,
   writeStoredFilters,
   writeStoredQuery,
 } from "./utils/searchStorage";
@@ -20,10 +18,6 @@ function App() {
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
-<<<<<<< HEAD
-  const [query, setQuery] = useState<string>(() => readStoredQuery());
-  const [filters, setFilters] = useState<DiscoverFilters>(() => readStoredFilters());
-=======
   const [query, setQuery] = useState<string>(() => {
     const savedQuery = sessionStorage.getItem("movieSearchQuery");
     if (!savedQuery) {
@@ -80,7 +74,6 @@ function App() {
       return {};
     }
   });
->>>>>>> d312a71 (add language filter option to FilterPanel)
 
   const { movies, isLoading, hasSearched, hasMore, loadMore } = useMovieResults(
     query,
