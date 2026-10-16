@@ -25,17 +25,22 @@ npm run install:all
 
 ### Setting up `.env`
 
-Because the website uses TMDB, you must have an API Key for API Read Access Token for TMDB.
+Because the website uses TMDB, you need a TMDB API key.
 The website uses mongoDB for user profiles, and rerquires both login credentials and for your current IP address to be whitelisted. Please get in contact on discord or at swal289@aucklandduni.ac.nz
-The `.env` should located in the project root, and may look like this once completed:
+Copy `.env.example` to `.env` in the project root and fill in your values:
 ```
-VITE_TMDB_API_KEY=someApiKeyHere
+TMDB_API_KEY=
+VITE_TMDB_API_KEY=yourKeyHere
 VITE_FRONTEND_PORT=5173
 BACKEND_PORT=5000
 MONGODB_USERNAME="user"
 MONGODB_PASSWORD="password"
 MONGODB_URI="uri"
 ```
+`TMDB_API_KEY` is used by the server and falls back to `VITE_TMDB_API_KEY` when empty.
+Never put secrets in `VITE_*` variables: Vite includes them in the browser bundle.
+
+Without a reachable `MONGODB_URI`, the server still starts in development ("degraded mode") and `/api/health` returns `503`. With `NODE_ENV=production` it refuses to start instead. To check your MongoDB connection, run `npm run test:db` from `server/`.
 
 ### Running the Website
 The dev servers for both the ExpressJS server and React client can be run concurrently through one command from the project root:

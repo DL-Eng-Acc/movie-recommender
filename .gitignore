@@ -10,6 +10,7 @@ atlas-credentials.env
 
 # Build
 client/dist/
+server/dist/
 
 # Logs
 *.log
