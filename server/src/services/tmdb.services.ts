@@ -20,12 +20,11 @@ interface TmdbSearchResponse {
  * Executes all searches concurrently
  */
 export const enrichMoviesWithImages = async (
-  movies: RecommendedMovie[]
+  movies: RecommendedMovie[],
+  tmdbApiKey: string | undefined,
 ): Promise<RecommendedMovie[]> => {
-  const tmdbApiKey = process.env.VITE_TMDB_API_KEY;
-
   if (!tmdbApiKey) {
-    console.warn('VITE_TMDB_API_KEY is missing from environment variables.');
+    console.warn('TMDB API key is not configured; recommendations will have no images.');
     return movies.map((movie) => ({ ...movie, imageUrl: null, movieId: '' }));
   }
 

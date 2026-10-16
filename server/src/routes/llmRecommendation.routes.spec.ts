@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import llmRouter from './llmRecommendation.routes.js';
+import { createLlmRecommendationRouter } from './llmRecommendation.routes.js';
 
 // mock setup for OpenAI SDK module
 const mockCreate = vi.fn();
@@ -21,7 +21,7 @@ vi.mock('openai', () => {
 
 const app = express();
 app.use(express.json());
-app.use('/api/llm-recommender', llmRouter);
+app.use('/api/llm-recommender', createLlmRecommendationRouter({ llmApiKey: 'test-llm-key' }));
 
 describe('GET /api/llm-recommender', () => {
   beforeEach(() => {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { searchMovies } from "../api/searchMovies";
 import { discoverMovies, type DiscoverFilters } from "../api/discoverMovies";
+import { RESULTS_FETCH_DEBOUNCE_MS } from "../constants/debounce";
 import type { Movie } from "../types/movie";
 
 interface UseMovieResultsResult {
@@ -107,7 +108,7 @@ export function useMovieResults(query: string, filters: DiscoverFilters): UseMov
       } finally {
         if (requestId === requestIdRef.current) setIsLoading(false);
       }
-    }, 300);
+    }, RESULTS_FETCH_DEBOUNCE_MS);
 
     return () => {
       clearTimeout(timeoutId);

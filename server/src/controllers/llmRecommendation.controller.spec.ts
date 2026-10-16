@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Request, Response } from 'express';
-import { getLlmRecommendations } from './llmRecommendation.controller.js';
+import type { Request, Response } from 'express';
+import { createLlmRecommendationController, type MovieQuery } from './llmRecommendation.controller.js';
+
+// No TMDB key, so recommendations are returned without poster lookups
+const { getLlmRecommendations } = createLlmRecommendationController({ llmApiKey: 'test-llm-key' });
 
 // mock setup for the OpenAI SDK module
 const mockCreate = vi.fn();
@@ -19,7 +22,7 @@ vi.mock('openai', () => {
 });
 
 describe('getLlmRecommendations Controller', () => {
-  let req: Partial<Request>;
+  let req: Partial<Request<{}, {}, {}, MovieQuery>>;
   let res: Partial<Response>;
 
   beforeEach(() => {
@@ -39,7 +42,7 @@ describe('getLlmRecommendations Controller', () => {
     it('returns status 400 when "movie" query parameter is missing', async () => {
       req.query = { releaseYear: '2010' };
 
-      await getLlmRecommendations(req as Request, res as Response);
+      await getLlmRecommendations(req as Request<{}, {}, {}, MovieQuery>, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
@@ -50,7 +53,7 @@ describe('getLlmRecommendations Controller', () => {
     it('returns status 400 when "releaseYear" query parameter is missing', async () => {
       req.query = { movie: 'Inception' };
 
-      await getLlmRecommendations(req as Request, res as Response);
+      await getLlmRecommendations(req as Request<{}, {}, {}, MovieQuery>, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
@@ -61,7 +64,7 @@ describe('getLlmRecommendations Controller', () => {
     it('returns status 400 when "releaseYear" is not a valid number', async () => {
       req.query = { movie: 'Inception', releaseYear: 'invalid-year' };
 
-      await getLlmRecommendations(req as Request, res as Response);
+      await getLlmRecommendations(req as Request<{}, {}, {}, MovieQuery>, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
@@ -111,7 +114,7 @@ describe('getLlmRecommendations Controller', () => {
         ],
       });
 
-      await getLlmRecommendations(req as Request, res as Response);
+      await getLlmRecommendations(req as Request<{}, {}, {}, MovieQuery>, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -133,7 +136,7 @@ describe('getLlmRecommendations Controller', () => {
         choices: [{ message: { content: null } }],
       });
 
-      await getLlmRecommendations(req as Request, res as Response);
+      await getLlmRecommendations(req as Request<{}, {}, {}, MovieQuery>, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
@@ -148,7 +151,7 @@ describe('getLlmRecommendations Controller', () => {
         choices: [{ message: { content: 'Not valid JSON' } }],
       });
 
-      await getLlmRecommendations(req as Request, res as Response);
+      await getLlmRecommendations(req as Request<{}, {}, {}, MovieQuery>, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith(
@@ -163,7 +166,7 @@ describe('getLlmRecommendations Controller', () => {
 
       mockCreate.mockRejectedValueOnce(new Error('OpenAI API Connection Timeout'));
 
-      await getLlmRecommendations(req as Request, res as Response);
+      await getLlmRecommendations(req as Request<{}, {}, {}, MovieQuery>, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({

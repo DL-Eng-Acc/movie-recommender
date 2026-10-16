@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { enrichMoviesWithImages, RecommendedMovie } from './tmdb.services';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { enrichMoviesWithImages, type RecommendedMovie } from './tmdb.services.js';
+
+const TMDB_API_KEY = 'mock-tmdb-api-key';
 
 describe('enrichMoviesWithImages Service', () => {
-  const originalEnv = process.env;
-
   const mockMovies: RecommendedMovie[] = [
     {
       title: 'Inception',
@@ -19,12 +19,6 @@ describe('enrichMoviesWithImages Service', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    // Set a mock TMDB_API_KEY environment variable for test cases
-    process.env = { ...originalEnv, VITE_TMDB_API_KEY: 'mock-tmdb-api-key' };
-  });
-
-  afterEach(() => {
-    process.env = originalEnv;
   });
 
   describe('Success Cases', () => {
@@ -47,7 +41,7 @@ describe('enrichMoviesWithImages Service', () => {
           )
         );
 
-      const result = await enrichMoviesWithImages(mockMovies);
+      const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
       expect(fetch).toHaveBeenCalledTimes(2);
 
@@ -93,11 +87,11 @@ describe('enrichMoviesWithImages Service', () => {
         )
       );
 
-      const result = await enrichMoviesWithImages(movieWithoutYear);
+      const result = await enrichMoviesWithImages(movieWithoutYear, TMDB_API_KEY);
 
       const calledUrl = new URL((fetch as any).mock.calls[0][0]);
       expect(calledUrl.searchParams.has('primary_release_year')).toBe(false);
-      expect(result[0].imageUrl).toBe(
+      expect(result[0]?.imageUrl).toBe(
         'https://image.tmdb.org/t/p/w500/matrix-poster.jpg'
       );
     });
@@ -105,10 +99,10 @@ describe('enrichMoviesWithImages Service', () => {
 
   describe('Edge & Missing Data Cases', () => {
     it('returns imageUrl as null when TMDB_API_KEY is not configured', async () => {
-      delete process.env.VITE_TMDB_API_KEY;
       const fetchSpy = vi.spyOn(globalThis, 'fetch');
+      vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-      const result = await enrichMoviesWithImages(mockMovies);
+      const result = await enrichMoviesWithImages(mockMovies, undefined);
 
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(result).toEqual([
@@ -122,10 +116,10 @@ describe('enrichMoviesWithImages Service', () => {
         new Response(JSON.stringify({ results: [] }), { status: 200 })
       );
 
-      const result = await enrichMoviesWithImages(mockMovies);
+      const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0].imageUrl).toBeNull();
-      expect(result[1].imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBeNull();
+      expect(result[1]?.imageUrl).toBeNull();
     });
 
     it('returns imageUrl as null when the top result has poster_path set to null', async () => {
@@ -138,9 +132,9 @@ describe('enrichMoviesWithImages Service', () => {
         )
       );
 
-      const result = await enrichMoviesWithImages(mockMovies);
+      const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0].imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBeNull();
     });
   });
 
@@ -152,10 +146,10 @@ describe('enrichMoviesWithImages Service', () => {
         })
       );
 
-      const result = await enrichMoviesWithImages(mockMovies);
+      const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0].imageUrl).toBeNull();
-      expect(result[1].imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBeNull();
+      expect(result[1]?.imageUrl).toBeNull();
     });
 
     it('returns imageUrl as null when fetch throws a network error', async () => {
@@ -163,10 +157,10 @@ describe('enrichMoviesWithImages Service', () => {
         new TypeError('Failed to fetch / Network connection lost')
       );
 
-      const result = await enrichMoviesWithImages(mockMovies);
+      const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0].imageUrl).toBeNull();
-      expect(result[1].imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBeNull();
+      expect(result[1]?.imageUrl).toBeNull();
     });
   });
 });
