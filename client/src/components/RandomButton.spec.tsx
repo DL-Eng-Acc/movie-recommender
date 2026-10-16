@@ -173,7 +173,7 @@ describe("RandomButton", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/No movie found matching your criteria/i)
+        screen.getByText(/Server is having issues. Please try again in a moment./i)
       ).toBeInTheDocument();
     });
   });

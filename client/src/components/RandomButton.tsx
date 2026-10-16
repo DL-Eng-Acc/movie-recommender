@@ -51,7 +51,19 @@ export default function RandomButton() {
             
           } catch (err: unknown) {
               console.log(err instanceof Error ? err.message : "Something went wrong with RandomButton.");
-              setToastMessage("No movie found matching your criteria. Please adjust filters.");
+              
+              let errorMessage = "Something went wrong while fetching a random movie. Please try again.";
+        
+              if (err instanceof Error) {
+                  if (err.message.includes("404")) {
+                      errorMessage = "No movie found matching your criteria. Please adjust filters.";
+                  } else if (err.message.includes("500") || err.message.includes("503")) {
+                      errorMessage = "Server is having issues. Please try again in a moment.";
+                  } else if (err.message.includes("Network") || err.message.includes("Failed to fetch")) {
+                      errorMessage = "Network error. Please check your connection and try again.";
+                 }
+              }
+              setToastMessage(errorMessage);
               setButtonName("Want a random movie?")
           }
     }
