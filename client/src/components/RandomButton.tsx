@@ -34,6 +34,9 @@ export default function RandomButton() {
             }
 
             // randomly select one from the list returned
+            // NOSONAR: Math.random() is fine here; we're just picking a random movie,
+            // not generating any security-sensitive value.
+            // eslint-disable-next-line sonarjs/pseudo-random
             const randomIndex = Math.floor(Math.random() * response.results.length);
             const randomMovie = response.results[randomIndex];
             if (!randomMovie) {

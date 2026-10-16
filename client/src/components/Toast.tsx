@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import "./Toast.css";
 
 interface ToastProps {
-  message: string;
-  onClose: () => void;
+  readonly message: string;
+  readonly onClose: () => void;
   // Allows custom duration; default is 10000ms (10 seconds).
-  duration?: number;
+  readonly duration?: number;
 }
 
 export default function Toast({ message, onClose, duration = 10000 }: ToastProps) {
