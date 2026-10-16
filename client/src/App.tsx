@@ -25,7 +25,7 @@ function App() {
     }
 
     try {
-      const parsed = JSON.parse(savedQuery);
+      const parsed = JSON.parse(savedQuery) as unknown;
 
       if (typeof parsed === "string" && /^[^<>]*$/.test(parsed)) {
         return parsed;
