@@ -8,6 +8,7 @@ export interface DiscoverFilters {
   genre?: number;
   yearFrom?: number;
   yearTo?: number;
+  language?: string;
   ratingMin?: number;
   // TMDB person ID, not a name. See searchPerson.ts, which resolves a
   // typed actor name to this ID before it ever reaches discoverMovies.
@@ -42,11 +43,20 @@ export async function discoverMovies(
   if (filters.genre) {params.with_genres = String(filters.genre)};
   // TMDB has no "year range" param, so a from/to range is built as two
   // separate date-boundary filters spanning Jan 1 to Dec 31 of each year.
+<<<<<<< HEAD
   if (filters.yearFrom) {params["primary_release_date.gte"] = `${filters.yearFrom}-01-01`};
   if (filters.yearTo) {params["primary_release_date.lte"] = `${filters.yearTo}-12-31`};
   if (filters.ratingMin) {params["vote_average.gte"] = String(filters.ratingMin)};
   if (filters.castId) {params.with_cast = String(filters.castId)};
   if (filters.page) {params.page = String(filters.page)};
+=======
+  if (filters.yearFrom) {url.searchParams.set("primary_release_date.gte", `${filters.yearFrom}-01-01`)};
+  if (filters.yearTo) {url.searchParams.set("primary_release_date.lte", `${filters.yearTo}-12-31`)};
+  if (filters.language) {url.searchParams.set("with_original_language", filters.language)};
+  if (filters.ratingMin) {url.searchParams.set("vote_average.gte", String(filters.ratingMin))};
+  if (filters.castId) {url.searchParams.set("with_cast", String(filters.castId))};
+  if (filters.page) {url.searchParams.set("page", String(filters.page))};
+>>>>>>> d312a71 (add language filter option to FilterPanel)
 
   const data = await tmdbGet<TmdbPage<TmdbMovieResult>>("/discover/movie", {
     params,

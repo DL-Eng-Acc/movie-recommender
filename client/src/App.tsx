@@ -20,8 +20,67 @@ function App() {
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
+<<<<<<< HEAD
   const [query, setQuery] = useState<string>(() => readStoredQuery());
   const [filters, setFilters] = useState<DiscoverFilters>(() => readStoredFilters());
+=======
+  const [query, setQuery] = useState<string>(() => {
+    const savedQuery = sessionStorage.getItem("movieSearchQuery");
+    if (!savedQuery) {
+      return "";
+    }
+
+    try {
+      const parsed = JSON.parse(savedQuery);
+
+      if (typeof parsed === "string" && /^[^<>]*$/.test(parsed)) {
+        return parsed;
+      }
+      return "";
+    } catch {
+      return "";
+    }
+  });
+
+  const [filters, setFilters] = useState<DiscoverFilters>(() => {
+    const savedFilters = sessionStorage.getItem("movieSearchFilters");
+    if (!savedFilters) {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(savedFilters);
+      const safeFilters: DiscoverFilters = {};
+
+      if (typeof parsed.genre === "number") {
+        safeFilters.genre = parsed.genre;
+      }
+      if (typeof parsed.yearFrom === "number") {
+        safeFilters.yearFrom = parsed.yearFrom;
+      }
+      if (typeof parsed.yearTo === "number") {
+        safeFilters.yearTo = parsed.yearTo;
+      }
+      if (typeof parsed.language === "string") {
+        safeFilters.language = parsed.language;
+      }
+      if (typeof parsed.ratingMin === "number") {
+        safeFilters.ratingMin = parsed.ratingMin;
+      }
+      if (typeof parsed.castId === "number") {
+        safeFilters.castId = parsed.castId;
+      }
+
+      if (["popularity", "rating", "release_date"].includes(parsed.sort)) {
+        safeFilters.sort = parsed.sort;
+      }
+
+      return safeFilters;
+    } catch {
+      return {};
+    }
+  });
+>>>>>>> d312a71 (add language filter option to FilterPanel)
 
   const { movies, isLoading, hasSearched, hasMore, loadMore } = useMovieResults(
     query,

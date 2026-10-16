@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { MOVIE_GENRES } from "../constants/genres";
+<<<<<<< HEAD
 import { CURRENT_YEAR, MIN_YEAR } from "../constants/filters";
+=======
+import { MOVIE_LANGUAGES } from "../constants/languages";
+>>>>>>> d312a71 (add language filter option to FilterPanel)
 import { searchPerson, type Person } from "../api/searchPerson";
 import { isSortOption, type DiscoverFilters, type SortOption } from "../api/discoverMovies";
 import "./FilterPanel.css";
@@ -34,6 +38,7 @@ export default function FilterPanel({
   const [genreId, setGenreId] = useState<number | undefined>(initialFilters?.genre);
   const [yearFrom, setYearFrom] = useState<number>(initialFilters?.yearFrom ?? MIN_YEAR);
   const [yearTo, setYearTo] = useState<number>(initialFilters?.yearTo ?? CURRENT_YEAR);
+  const [language, setLanguage] = useState<string | undefined>(initialFilters?.language);
   const [ratingMin, setRatingMin] = useState<number>(initialFilters?.ratingMin ?? 0);
   const [sort, setSort] = useState<SortOption>(initialFilters?.sort ?? "popularity");
 
@@ -90,12 +95,13 @@ export default function FilterPanel({
       genre: genreId,
       yearFrom,
       yearTo,
+      language: language || undefined,
       ratingMin: ratingMin > 0 ? ratingMin : undefined,
       castId: searchActive ? undefined : selectedActor?.id,
       sort,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [genreId, yearFrom, yearTo, ratingMin, selectedActor, sort, searchActive]);
+  }, [genreId, yearFrom, yearTo, language, ratingMin, selectedActor, sort, searchActive]);
 
   function handleSelectActor(person: Person) {
     setSelectedActor(person);
@@ -214,7 +220,23 @@ export default function FilterPanel({
             />
           </div>
         </div>
-
+        
+        <div className="filter-field">
+          <label htmlFor="language-select">Language</label>
+          <select
+            id="language-select"
+            value={language ?? ""}
+            onChange={(e) => setLanguage(e.target.value || undefined)}
+          >
+            <option value="">All languages</option>
+            {MOVIE_LANGUAGES.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        
         <div className="filter-field">
           <label htmlFor="rating-slider">
             Minimum rating {ratingMin > 0 ? `(${ratingMin.toFixed(1)}+)` : ""}
