@@ -43,7 +43,7 @@ function App() {
     }
 
     try {
-      const parsed = JSON.parse(savedFilters);
+      const parsed = JSON.parse(savedFilters) as Record<string, unknown>;
       const safeFilters: DiscoverFilters = {};
 
       if (typeof parsed.genre === "number") {
@@ -65,8 +65,8 @@ function App() {
         safeFilters.castId = parsed.castId;
       }
 
-      if (["popularity", "rating", "release_date"].includes(parsed.sort)) {
-        safeFilters.sort = parsed.sort;
+      if (typeof parsed.sort === "string" && ["popularity", "rating", "release_date"].includes(parsed.sort)) {
+        safeFilters.sort = parsed.sort as DiscoverFilters["sort"];
       }
 
       return safeFilters;

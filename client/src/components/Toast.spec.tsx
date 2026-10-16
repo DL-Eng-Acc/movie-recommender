@@ -5,7 +5,7 @@ import { vi } from "vitest";
 describe("Toast", () => {
   it("disappears automatically after 10 seconds", () => {
     vi.useFakeTimers(); // use a fake timer
-    const handleClose = vi.fn();
+    const handleClose = vi.fn<() => void>();
 
     render(<Toast message="Test toast" onClose={handleClose} />);
     expect(screen.getByText("Test toast")).toBeInTheDocument();
@@ -20,7 +20,7 @@ describe("Toast", () => {
   });
 
   it("disappears when clicking the close button", () => {
-    const handleClose = vi.fn();
+    const handleClose = vi.fn<() => void>();
     render(<Toast message="Test toast" onClose={handleClose} />);
     
     act(() => {
