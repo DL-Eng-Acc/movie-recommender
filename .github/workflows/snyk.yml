@@ -27,7 +27,7 @@ jobs:
           SNYK_VERSION: 1.1307.4
           SNYK_SHA256: b0baee4fa4d7d11b7df927a1046cf8137a8a89fafac8101a45c3c0e0777ddc35
         run: |
-          curl -fsSL -o snyk "https://static.snyk.io/cli/v${SNYK_VERSION}/snyk-linux"
+          curl --proto '=https' --tlsv1.2 -fsSL -o snyk "https://static.snyk.io/cli/v${SNYK_VERSION}/snyk-linux"
           echo "${SNYK_SHA256}  snyk" | sha256sum --check --strict
           sudo install -m 0755 snyk /usr/local/bin/snyk
           rm snyk
