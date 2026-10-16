@@ -36,6 +36,7 @@ BACKEND_PORT=5000
 MONGODB_USERNAME="user"
 MONGODB_PASSWORD="password"
 MONGODB_URI="uri"
+SESSION_SECRET="replace-with-a-long-random-secret"
 ```
 `TMDB_API_KEY` is used by the server and falls back to `VITE_TMDB_API_KEY` when empty.
 Never put secrets in `VITE_*` variables: Vite includes them in the browser bundle.
