@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { apiFetch } from "../api"
 import { useNavigate } from "react-router-dom";
+import type { TmdbMovieDetails } from "../types/tmdb";
 import "../styles/RandomButton.css"
 
 export default function RandomButton() {
@@ -9,10 +10,13 @@ export default function RandomButton() {
     const getRandom = async () => {
         try {
             setButtonName("Generating...")
-            const movieData = await apiFetch<{ id: string }>("/movies/random");
+            // The backend passes TMDB's movie details through unchanged
+            const movieData = await apiFetch<Pick<TmdbMovieDetails, "id">>(
+                "/movies/random",
+            );
             setButtonName("Generated!")
             // causes redirect (go to movie page)
-            navigate(`/movie/${movieData.id}`)
+            void navigate(`/movie/${movieData.id}`)
         } catch (err: unknown) {
             console.log(err instanceof Error ? err.message : "Something went wrong with RandomButton.");
             setButtonName("Want a random movie?")
@@ -20,7 +24,7 @@ export default function RandomButton() {
     }
 
     return (
-        <button type="button" onClick={getRandom} className="cursor-pointer text-sm" id="random-button">
+        <button type="button" onClick={() => void getRandom()} className="cursor-pointer text-sm" id="random-button">
             {buttonName}
         </button>
     )

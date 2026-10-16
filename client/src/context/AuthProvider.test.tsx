@@ -7,8 +7,8 @@ import { getCurrentUser, requestLogout } from "../api/auth";
 import type { User } from "../types/user";
 
 vi.mock("../api/auth", () => ({
-  getCurrentUser: vi.fn(),
-  requestLogout: vi.fn(),
+  getCurrentUser: vi.fn<() => Promise<User | null>>(),
+  requestLogout: vi.fn<() => Promise<void>>(),
 }));
 
 const testUser: User = {

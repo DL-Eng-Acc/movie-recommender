@@ -6,7 +6,12 @@ import App from "./App.tsx";
 import MovieDetail from "./pages/MovieDetail.tsx";
 import { AuthProvider } from "./context/AuthProvider.tsx";
 
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error('index.html is missing the <div id="root"> element');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <AuthProvider>
       <BrowserRouter>
