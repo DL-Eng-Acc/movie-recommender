@@ -64,9 +64,20 @@ describe("loadConfig", () => {
   });
 
   it("passes optional keys through", () => {
-    const config = loadConfig({ ...withKey, MONGODB_URI: "mongodb://x", JWT_SECRET: "s", LLM_API_KEY: "l" });
+    const config = loadConfig({
+      ...withKey,
+      MONGODB_URI: "mongodb://x",
+      JWT_SECRET: "s",
+      LLM_API_KEY: "l",
+      SESSION_SECRET: "session",
+    });
 
-    expect(config).toMatchObject({ mongoUri: "mongodb://x", jwtSecret: "s", llmApiKey: "l" });
+    expect(config).toMatchObject({
+      mongoUri: "mongodb://x",
+      jwtSecret: "s",
+      llmApiKey: "l",
+      sessionSecret: "session",
+    });
   });
 
   it("falls back to OPENAI_API_KEY for the LLM key", () => {

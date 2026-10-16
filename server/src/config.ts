@@ -9,6 +9,8 @@ export interface AppConfig {
   // Optional until Members 1/3 need them
   jwtSecret?: string;
   llmApiKey?: string;
+  // Required in production; a fixed development secret is used otherwise
+  sessionSecret?: string;
 }
 
 function parsePort(value: string | undefined, fallback: number, name: string): number {
@@ -42,5 +44,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     jwtSecret: env.JWT_SECRET,
     // OPENAI_API_KEY is the name the OpenAI SDK and docs use
     llmApiKey: nonEmpty(env.LLM_API_KEY) ?? nonEmpty(env.OPENAI_API_KEY),
+    sessionSecret: nonEmpty(env.SESSION_SECRET),
   };
 }

@@ -1,8 +1,10 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import { createSessionMiddleware } from "./auth/session.js";
 import type { AppConfig } from "./config.js";
 import { isDatabaseConnected } from "./db.js";
 import { errorHandler, notFound } from "./middleware/error.middleware.js";
+import { createAuthRouter } from "./routes/auth.routes.js";
 import { createLlmRecommendationRouter } from "./routes/llmRecommendation.routes.js";
 import { createMoviesRouter } from "./routes/movies.routes.js";
 import { createTmdbClient, type TmdbClient } from "./tmdb/tmdb.client.js";
@@ -27,8 +29,10 @@ export function createApp(
   const app = express();
   app.disable("x-powered-by");
 
-  app.use(cors({ origin: config.frontendOrigin }));
+  // credentials: true lets the browser send the session cookie cross-origin
+  app.use(cors({ origin: config.frontendOrigin, credentials: true }));
   app.use(express.json());
+  app.use(createSessionMiddleware(config));
 
   app.get<{}, HealthResponse>("/api/health", (_req, res) => {
     const ready = deps.isDatabaseReady();
@@ -37,6 +41,7 @@ export function createApp(
       database: ready ? "connected" : "disconnected",
     });
   });
+  app.use("/api/auth", createAuthRouter(config, deps));
   app.use("/api/movies", createMoviesRouter(deps));
   app.use("/api/llm-recommender", createLlmRecommendationRouter(config));
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { searchMovies } from "../api/searchMovies";
 import { discoverMovies, type DiscoverFilters } from "../api/discoverMovies";
+import { isAbortError } from "../api/tmdb";
 import { RESULTS_FETCH_DEBOUNCE_MS } from "../constants/debounce";
 import type { Movie } from "../types/movie";
 
@@ -102,7 +103,7 @@ export function useMovieResults(query: string, filters: DiscoverFilters): UseMov
         setTotalPages(newTotalPages);
         setHasSearched(true);
       } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") return;
+        if (isAbortError(err)) return;
         if (requestId !== requestIdRef.current) return;
         setError(err instanceof Error ? err.message : "Failed to load movies");
       } finally {
