@@ -80,6 +80,11 @@ describe("loadConfig", () => {
     });
   });
 
+  it("falls back to OPENAI_API_KEY for the LLM key", () => {
+    expect(loadConfig({ ...withKey, OPENAI_API_KEY: "openai" }).llmApiKey).toBe("openai");
+    expect(loadConfig({ ...withKey, LLM_API_KEY: "l", OPENAI_API_KEY: "openai" }).llmApiKey).toBe("l");
+  });
+
   it("treats an empty MONGODB_URI as unset", () => {
     expect(loadConfig({ ...withKey, MONGODB_URI: "  " }).mongoUri).toBeUndefined();
   });
