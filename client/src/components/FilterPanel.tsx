@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { MOVIE_GENRES } from "../constants/genres";
+import { CURRENT_YEAR, MIN_YEAR } from "../constants/filters";
 import { searchPerson, type Person } from "../api/searchPerson";
-import type { DiscoverFilters } from "../api/discoverMovies";
+import { isSortOption, type DiscoverFilters, type SortOption } from "../api/discoverMovies";
 import "./FilterPanel.css";
 
-const CURRENT_YEAR = new Date().getFullYear();
-const MIN_YEAR = 1900;
-
 const SORT_OPTIONS: {
-  value: NonNullable<DiscoverFilters["sort"]>;
+  value: SortOption;
   label: string;
 }[] = [
   { value: "popularity", label: "Popularity" },
@@ -37,7 +35,7 @@ export default function FilterPanel({
   const [yearFrom, setYearFrom] = useState<number>(initialFilters?.yearFrom ?? MIN_YEAR);
   const [yearTo, setYearTo] = useState<number>(initialFilters?.yearTo ?? CURRENT_YEAR);
   const [ratingMin, setRatingMin] = useState<number>(initialFilters?.ratingMin ?? 0);
-  const [sort, setSort] = useState<DiscoverFilters["sort"]>(initialFilters?.sort ?? "popularity");
+  const [sort, setSort] = useState<SortOption>(initialFilters?.sort ?? "popularity");
 
   // initialFilters only carries a numeric castId (see DiscoverFilters),
   // not a display name, so the actor's name is separately round-tripped
@@ -51,7 +49,8 @@ export default function FilterPanel({
     if (!initialFilters?.castId) return null;
     const savedName = sessionStorage.getItem("movieSearchActorName");
     if (!savedName) return null;
-    return { id: initialFilters.castId, name: savedName } as Person;
+    // Only the id and name are saved; the rest isn't needed to show the chip.
+    return { id: initialFilters.castId, name: savedName, profileUrl: null, knownFor: null };
   });
   const [actorSearchLoading, setActorSearchLoading] = useState(false);
 
@@ -236,7 +235,9 @@ export default function FilterPanel({
           <select
             id="sort-select"
             value={sort}
-            onChange={(e) => setSort(e.target.value as DiscoverFilters["sort"])}
+            onChange={(e) => {
+              if (isSortOption(e.target.value)) setSort(e.target.value);
+            }}
           >
             {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
