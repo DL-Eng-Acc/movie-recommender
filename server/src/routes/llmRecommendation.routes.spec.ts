@@ -91,7 +91,7 @@ describe('GET /api/llm-recommender', () => {
     expect(res.status).toBe(500);
     expect(res.body).toEqual({
       error: 'An internal server error occurred while processing your request.',
-      message: 'Rate limit exceeded',
+      message: 'AI recommendations failed.',
     });
   });
 });

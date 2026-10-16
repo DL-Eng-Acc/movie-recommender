@@ -171,7 +171,7 @@ describe('getLlmRecommendations Controller', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         error: 'An internal server error occurred while processing your request.',
-        message: 'OpenAI API Connection Timeout',
+        message: 'AI recommendations failed.',
       });
     });
   });
