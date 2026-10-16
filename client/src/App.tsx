@@ -148,6 +148,7 @@ function App() {
         <FilterPanel
           onFiltersChange={setFilters}
           searchActive={query.length > 0}
+          initialFilters={filters}
         />
       </div>
 
