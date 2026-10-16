@@ -36,8 +36,22 @@ describe('GET /api/llm-recommender', () => {
           title: 'Blade Runner 2049',
           releaseYear: 2017,
           justification: 'Matches visual atmosphere and sci-fi genre.',
-          imageUrl: null,
-          movieId: "",
+          imageUrl: 'https://via.placeholder.com/300x450?text=No+Poster',
+          movieId: '',
+        },
+        {
+          title: 'Interstellar',
+          releaseYear: 2014,
+          justification: 'Explores deep space and complex emotional narratives.',
+          imageUrl: 'https://via.placeholder.com/300x450?text=No+Poster',
+          movieId: '',
+        },
+        {
+          title: 'The Matrix',
+          releaseYear: 1999,
+          justification: 'Groundbreaking reality-bending science fiction.',
+          imageUrl: 'https://via.placeholder.com/300x450?text=No+Poster',
+          movieId: '',
         },
       ],
     };
@@ -58,6 +72,32 @@ describe('GET /api/llm-recommender', () => {
         releaseYear: 2010,
       },
       data: mockPayload,
+    });
+  });
+
+  it('500 - Returns error when OpenAI payload does not contain exactly 3 recommendations or has empty fields', async () => {
+    const invalidPayload = {
+      userInterestSummary: '',
+      recommendations: [
+        {
+          title: 'Blade Runner 2049',
+          releaseYear: 2017,
+          justification: 'Matches visual atmosphere and sci-fi genre.',
+        },
+      ],
+    };
+
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: JSON.stringify(invalidPayload) } }],
+    });
+
+    const res = await request(app)
+      .get('/api/llm-recommender')
+      .query({ movie: 'Inception', releaseYear: '2010' });
+
+    expect(res.status).toBe(500);
+    expect(res.body).toEqual({
+      error: 'Received invalid recommendation payload from OpenAI. Expected 3 complete recommendations.',
     });
   });
 

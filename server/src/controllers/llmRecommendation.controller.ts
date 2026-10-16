@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import OpenAI from 'openai';
 import type { AppConfig } from '../config.js';
 import { enrichMoviesWithImages, type RecommendedMovie } from '../services/tmdb.services.js';
+import { error } from 'node:console';
 
 // Type definitions for the incoming request query parameters
 export interface MovieQuery {
@@ -80,6 +81,13 @@ You are a movie recommendation system. Given a movie title and its release year,
       // Parse structured JSON response
       const parsedData: OpenAIRecommendationPayload = JSON.parse(rawContent);
 
+      if (!validateMoviePayload(parsedData)) {
+        res.status(500).json({
+          error: 'Received invalid recommendation payload from OpenAI. Expected 3 complete recommendations.',
+        });
+        return;
+      }
+
       // enrich with image URLs from TMDB
       const enrichedMovies = await enrichMoviesWithImages(parsedData.recommendations, tmdbApiKey);
 
@@ -95,7 +103,8 @@ You are a movie recommendation system. Given a movie title and its release year,
           recommendations: enrichedMovies,
         },
       });
-    } catch (_error) {
+    } catch (error) {
+      console.log(error);
       res.status(500).json({
         error: 'An internal server error occurred while processing your request.',
         message: 'AI recommendations failed.',
@@ -104,4 +113,24 @@ You are a movie recommendation system. Given a movie title and its release year,
   };
 
   return { getLlmRecommendations };
+}
+
+function validateMoviePayload(payload: any): payload is OpenAIRecommendationPayload {
+  return (
+    typeof payload?.userInterestSummary === 'string' &&
+    payload.userInterestSummary.trim() !== '' &&
+    Array.isArray(payload?.recommendations) &&
+    payload.recommendations.length === 3 &&
+    payload.recommendations.every(
+      (rec: any) =>
+        typeof rec?.title === 'string' &&
+        rec.title.trim() !== '' &&
+        rec?.releaseYear !== undefined &&
+        rec?.releaseYear !== null &&
+        String(rec.releaseYear).trim() !== '' &&
+        !Number.isNaN(Number(rec.releaseYear)) &&
+        typeof rec?.justification === 'string' &&
+        rec.justification.trim() !== ''
+    )
+  );
 }

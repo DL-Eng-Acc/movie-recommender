@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { enrichMoviesWithImages, type RecommendedMovie } from './tmdb.services.js';
+import { enrichMoviesWithImages, DEFAULT_POSTER_IMAGE, type RecommendedMovie } from './tmdb.services.js';
 
 const TMDB_API_KEY = 'mock-tmdb-api-key';
 
@@ -98,7 +98,7 @@ describe('enrichMoviesWithImages Service', () => {
   });
 
   describe('Edge & Missing Data Cases', () => {
-    it('returns imageUrl as null when TMDB_API_KEY is not configured', async () => {
+    it('returns default image when TMDB_API_KEY is not configured', async () => {
       const fetchSpy = vi.spyOn(globalThis, 'fetch');
       vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
@@ -106,23 +106,23 @@ describe('enrichMoviesWithImages Service', () => {
 
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(result).toEqual([
-        { ...mockMovies[0], imageUrl: null, movieId: "" },
-        { ...mockMovies[1], imageUrl: null, movieId: "" },
+        { ...mockMovies[0], imageUrl: DEFAULT_POSTER_IMAGE, movieId: "" },
+        { ...mockMovies[1], imageUrl: DEFAULT_POSTER_IMAGE, movieId: "" },
       ]);
     });
 
-    it('returns imageUrl as null when TMDB search yields no results', async () => {
+    it('returns default image when TMDB search yields no results', async () => {
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
         new Response(JSON.stringify({ results: [] }), { status: 200 })
       );
 
       const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0]?.imageUrl).toBeNull();
-      expect(result[1]?.imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
+      expect(result[1]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
     });
 
-    it('returns imageUrl as null when the top result has poster_path set to null', async () => {
+    it('returns default image when the top result has poster_path set to null', async () => {
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
         new Response(
           JSON.stringify({
@@ -134,12 +134,12 @@ describe('enrichMoviesWithImages Service', () => {
 
       const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0]?.imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
     });
   });
 
   describe('Error Cases', () => {
-    it('returns imageUrl as null when TMDB returns an HTTP error status code (e.g. 401, 500)', async () => {
+    it('returns default image when TMDB returns an HTTP error status code (e.g. 401, 500)', async () => {
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
         new Response(JSON.stringify({ status_message: 'Invalid API key' }), {
           status: 401,
@@ -148,19 +148,30 @@ describe('enrichMoviesWithImages Service', () => {
 
       const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0]?.imageUrl).toBeNull();
-      expect(result[1]?.imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
+      expect(result[1]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
     });
 
-    it('returns imageUrl as null when fetch throws a network error', async () => {
+    it('returns default image when fetch throws a network error', async () => {
       vi.spyOn(globalThis, 'fetch').mockRejectedValue(
         new TypeError('Failed to fetch / Network connection lost')
       );
 
       const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
 
-      expect(result[0]?.imageUrl).toBeNull();
-      expect(result[1]?.imageUrl).toBeNull();
+      expect(result[0]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
+      expect(result[1]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
+    });
+
+    it('returns default image when fetch times out', async () => {
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(
+        new DOMException('The operation was aborted due to timeout', 'TimeoutError')
+      );
+
+      const result = await enrichMoviesWithImages(mockMovies, TMDB_API_KEY);
+
+      expect(result[0]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
+      expect(result[1]?.imageUrl).toBe(DEFAULT_POSTER_IMAGE);
     });
   });
 });

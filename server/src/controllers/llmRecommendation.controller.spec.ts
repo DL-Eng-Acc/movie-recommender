@@ -84,21 +84,21 @@ describe('getLlmRecommendations Controller', () => {
             title: 'Interstellar',
             releaseYear: 2014,
             justification: 'Shares theme of deep human emotion within high-concept sci-fi.',
-            imageUrl: null,
+            imageUrl: 'https://via.placeholder.com/300x450?text=No+Poster',
             movieId: ''
           },
           {
             title: 'Shutter Island',
             releaseYear: 2010,
             justification: 'Directed by Christopher Nolan style psychological depth.',
-            imageUrl: null,
+            imageUrl: 'https://via.placeholder.com/300x450?text=No+Poster',
             movieId: ''
           },
           {
             title: 'The Matrix',
             releaseYear: 1999,
             justification: 'Features reality-bending mechanics and philosophical themes.',
-            imageUrl: null,
+            imageUrl: 'https://via.placeholder.com/300x450?text=No+Poster',
             movieId: ''
           },
         ],
