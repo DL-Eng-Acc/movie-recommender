@@ -95,10 +95,10 @@ You are a movie recommendation system. Given a movie title and its release year,
           recommendations: enrichedMovies,
         },
       });
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         error: 'An internal server error occurred while processing your request.',
-        message: error instanceof Error ? error.message : String(error),
+        message: 'AI recommendations failed.',
       });
     }
   };
