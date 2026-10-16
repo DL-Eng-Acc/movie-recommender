@@ -7,10 +7,11 @@ function messageFromErrorBody(body: unknown): string | null {
   return null;
 }
 
-// used only by RandomButton??? why
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers);
-  if (!headers.has('Content-Type')) {
+
+  // Only set Content-Type when a body is present and the header isn't already set
+  if (options.body != null && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
   const res = await fetch(`${BASE_URL}${path}`, {
