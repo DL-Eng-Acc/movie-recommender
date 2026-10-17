@@ -34,3 +34,22 @@ export async function requestLogin(input: LoginInput): Promise<User> {
 
   return response.user;
 }
+
+interface SignupInput {
+  username: string;
+  email: string;
+  password: string;
+}
+
+interface SignupResponse {
+  user: User;
+}
+
+export async function requestSignup(input: SignupInput): Promise<User> {
+  const response = await apiFetch<SignupResponse>("/auth/signup", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+
+  return response.user;
+}

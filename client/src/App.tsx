@@ -105,6 +105,9 @@ function App() {
         <Link to="/login" className="login-link">
           Log in
         </Link>
+        <Link to="/signup" className="login-link">
+          Register
+        </Link>
       </div>
       <SearchBar
         onQueryChange={setQuery}

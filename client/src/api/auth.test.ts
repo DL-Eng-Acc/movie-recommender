@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 import { server } from "../test/server";
-import { getCurrentUser, requestLogin, requestLogout } from "./auth";
+import { getCurrentUser, requestLogin, requestLogout, requestSignup } from "./auth";
 import { apiFetch } from "./index";
 
 const BASE_URL =
@@ -205,5 +205,55 @@ describe("login API", () => {
         password: "example-password",
       }),
     ).rejects.toThrow("Authentication is unavailable");
+  });
+});
+
+describe("signup API", () => {
+  it("sends account details with browser credentials", async () => {
+    let receivedBody: unknown;
+    let credentials: RequestCredentials | undefined;
+
+    server.use(
+      http.post(`${BASE_URL}/auth/signup`, async ({ request }) => {
+        receivedBody = await request.json();
+        credentials = request.credentials;
+
+        return HttpResponse.json({ user: testUser }, { status: 201 });
+      }),
+    );
+
+    await expect(
+      requestSignup({
+        username: "film_fan",
+        email: "film@example.com",
+        password: "example-password",
+      }),
+    ).resolves.toEqual(testUser);
+
+    expect(receivedBody).toEqual({
+      username: "film_fan",
+      email: "film@example.com",
+      password: "example-password",
+    });
+    expect(credentials).toBe("include");
+  });
+
+  it("propagates duplicate-account errors", async () => {
+    server.use(
+      http.post(`${BASE_URL}/auth/signup`, () =>
+        HttpResponse.json(
+          { message: "Username or email is already registered" },
+          { status: 409 },
+        ),
+      ),
+    );
+
+    await expect(
+      requestSignup({
+        username: "film_fan",
+        email: "film@example.com",
+        password: "example-password",
+      }),
+    ).rejects.toThrow("Username or email is already registered");
   });
 });
