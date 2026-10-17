@@ -121,38 +121,41 @@ function App() {
     filters.castId !== undefined ||
     (filters.yearFrom !== undefined && filters.yearFrom !== MIN_YEAR) ||
     (filters.yearTo !== undefined && filters.yearTo !== CURRENT_YEAR);
+    let accountActions;
 
+    if (isAuthLoading) {
+      accountActions = <output>Checking your session…</output>;
+    } else if (user) {
+      accountActions = (
+        <>
+          <span>Hello, {user.username}</span>
+
+          <button
+            type="button"
+            className="login-link"
+            onClick={() => void handleLogout()}
+            disabled={isLoggingOut}
+          >
+            {isLoggingOut ? "Logging out…" : "Log out"}
+          </button>
+        </>
+      );
+    } else {
+      accountActions = (
+        <>
+          <Link to="/login" className="login-link">
+            Log in
+          </Link>
+
+          <Link to="/signup" className="login-link">
+            Register
+          </Link>
+        </>
+      );
+    }
   return (
     <section id="search-page">
-      <div className="account-actions">
-        {isAuthLoading ? (
-          <span role="status">Checking your session…</span>
-        ) : user ? (
-          <>
-            <span>Hello, {user.username}</span>
-
-            <button
-              type="button"
-              className="login-link"
-              onClick={() => void handleLogout()}
-              disabled={isLoggingOut}
-            >
-              {isLoggingOut ? "Logging out…" : "Log out"}
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="login-link">
-              Log in
-            </Link>
-
-            <Link to="/signup" className="login-link">
-              Register
-            </Link>
-          </>
-        )}
-      </div>
-
+      <div className="account-actions">{accountActions}</div>
       {logoutError && (
         <p className="account-error" role="alert">
           {logoutError}

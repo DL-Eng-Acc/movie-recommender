@@ -50,8 +50,8 @@ export default function Login() {
   }
 
   if (isLoading) {
-    return <p role="status">Checking your session…</p>;
-  }
+    return <output>Checking your session…</output>;
+    }
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -100,6 +100,9 @@ export default function Login() {
             {isSubmitting ? "Logging in…" : "Log in"}
           </button>
         </form>
+        <p>
+            Don't have an account? <Link to="/signup">Register</Link>
+        </p>
       </section>
     </main>
   );

@@ -77,7 +77,7 @@ export default function Signup() {
   }
 
   if (isLoading) {
-    return <p role="status">Checking your session…</p>;
+    return <output>Checking your session…</output>;
   }
 
   if (isAuthenticated) {
