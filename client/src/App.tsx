@@ -10,8 +10,6 @@ import type { DiscoverFilters } from "./api/discoverMovies";
 import RandomButton from "./components/RandomButton.tsx";
 import { CURRENT_YEAR, MIN_YEAR } from "./constants/filters";
 import {
-  readStoredFilters,
-  readStoredQuery,
   writeStoredFilters,
   writeStoredQuery,
 } from "./utils/searchStorage";
@@ -20,8 +18,62 @@ function App() {
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
-  const [query, setQuery] = useState<string>(() => readStoredQuery());
-  const [filters, setFilters] = useState<DiscoverFilters>(() => readStoredFilters());
+  const [query, setQuery] = useState<string>(() => {
+    const savedQuery = sessionStorage.getItem("movieSearchQuery");
+    if (!savedQuery) {
+      return "";
+    }
+
+    try {
+      const parsed = JSON.parse(savedQuery) as unknown;
+
+      if (typeof parsed === "string" && /^[^<>]*$/.test(parsed)) {
+        return parsed;
+      }
+      return "";
+    } catch {
+      return "";
+    }
+  });
+
+  const [filters, setFilters] = useState<DiscoverFilters>(() => {
+    const savedFilters = sessionStorage.getItem("movieSearchFilters");
+    if (!savedFilters) {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(savedFilters) as Record<string, unknown>;
+      const safeFilters: DiscoverFilters = {};
+
+      if (typeof parsed.genre === "number") {
+        safeFilters.genre = parsed.genre;
+      }
+      if (typeof parsed.yearFrom === "number") {
+        safeFilters.yearFrom = parsed.yearFrom;
+      }
+      if (typeof parsed.yearTo === "number") {
+        safeFilters.yearTo = parsed.yearTo;
+      }
+      if (typeof parsed.language === "string") {
+        safeFilters.language = parsed.language;
+      }
+      if (typeof parsed.ratingMin === "number") {
+        safeFilters.ratingMin = parsed.ratingMin;
+      }
+      if (typeof parsed.castId === "number") {
+        safeFilters.castId = parsed.castId;
+      }
+
+      if (typeof parsed.sort === "string" && ["popularity", "rating", "release_date"].includes(parsed.sort)) {
+        safeFilters.sort = parsed.sort as DiscoverFilters["sort"];
+      }
+
+      return safeFilters;
+    } catch {
+      return {};
+    }
+  });
 
   const { movies, isLoading, hasSearched, hasMore, loadMore } = useMovieResults(
     query,

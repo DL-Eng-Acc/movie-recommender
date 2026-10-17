@@ -8,6 +8,7 @@ export interface DiscoverFilters {
   genre?: number;
   yearFrom?: number;
   yearTo?: number;
+  language?: string;
   ratingMin?: number;
   // TMDB person ID, not a name. See searchPerson.ts, which resolves a
   // typed actor name to this ID before it ever reaches discoverMovies.
@@ -44,6 +45,7 @@ export async function discoverMovies(
   // separate date-boundary filters spanning Jan 1 to Dec 31 of each year.
   if (filters.yearFrom) {params["primary_release_date.gte"] = `${filters.yearFrom}-01-01`};
   if (filters.yearTo) {params["primary_release_date.lte"] = `${filters.yearTo}-12-31`};
+  if (filters.language) {params["with_original_language"] = filters.language};
   if (filters.ratingMin) {params["vote_average.gte"] = String(filters.ratingMin)};
   if (filters.castId) {params.with_cast = String(filters.castId)};
   if (filters.page) {params.page = String(filters.page)};

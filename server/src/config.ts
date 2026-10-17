@@ -42,7 +42,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     isProduction: env.NODE_ENV === "production",
     mongoUri: nonEmpty(env.MONGODB_URI),
     jwtSecret: env.JWT_SECRET,
-    llmApiKey: env.LLM_API_KEY,
+    // OPENAI_API_KEY is the name the OpenAI SDK and docs use
+    llmApiKey: nonEmpty(env.LLM_API_KEY) ?? nonEmpty(env.OPENAI_API_KEY),
     sessionSecret: nonEmpty(env.SESSION_SECRET),
   };
 }
