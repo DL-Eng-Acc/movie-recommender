@@ -10,7 +10,7 @@ import type { DiscoverFilters } from "./api/discoverMovies";
 import RandomButton from "./components/RandomButton.tsx";
 import { CURRENT_YEAR, MIN_YEAR } from "./constants/filters";
 import { writeStoredFilters, writeStoredQuery } from "./utils/searchStorage";
-import {useAuth} from "./hooks/useAuth.ts";
+import { useAuth } from "./hooks/useAuth.ts";
 
 function App() {
   const { user, isLoading: isAuthLoading, logout } = useAuth();
@@ -121,38 +121,39 @@ function App() {
     filters.castId !== undefined ||
     (filters.yearFrom !== undefined && filters.yearFrom !== MIN_YEAR) ||
     (filters.yearTo !== undefined && filters.yearTo !== CURRENT_YEAR);
-    let accountActions;
+      let accountActions;
 
-    if (isAuthLoading) {
-      accountActions = <output>Checking your session…</output>;
-    } else if (user) {
-      accountActions = (
-        <>
-          <span>Hello, {user.username}</span>
+  if (isAuthLoading) {
+    accountActions = <output>Checking your session…</output>;
+  } else if (user) {
+    accountActions = (
+      <>
+        <span>Hello, {user.username}</span>
 
-          <button
-            type="button"
-            className="login-link"
-            onClick={() => void handleLogout()}
-            disabled={isLoggingOut}
-          >
-            {isLoggingOut ? "Logging out…" : "Log out"}
-          </button>
-        </>
-      );
-    } else {
-      accountActions = (
-        <>
-          <Link to="/login" className="login-link">
-            Log in
-          </Link>
+        <button
+          type="button"
+          className="login-link"
+          onClick={() => void handleLogout()}
+          disabled={isLoggingOut}
+        >
+          {isLoggingOut ? "Logging out…" : "Log out"}
+        </button>
+      </>
+    );
+  } else {
+    accountActions = (
+      <>
+        <Link to="/login" className="login-link">
+          Log in
+        </Link>
 
-          <Link to="/signup" className="login-link">
-            Register
-          </Link>
-        </>
-      );
-    }
+        <Link to="/signup" className="login-link">
+          Register
+        </Link>
+      </>
+    );
+  }
+
   return (
     <section id="search-page">
       <div className="account-actions">{accountActions}</div>

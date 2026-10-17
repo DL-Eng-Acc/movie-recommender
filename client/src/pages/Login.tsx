@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { requestLogin } from "../api/auth";
 import { useAuth } from "../hooks/useAuth";
-import "./Login.css";
+import "./AuthForm.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export default function Login() {
 
   if (isLoading) {
     return <output>Checking your session…</output>;
-    }
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;

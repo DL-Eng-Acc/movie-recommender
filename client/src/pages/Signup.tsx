@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { requestSignup } from "../api/auth";
 import { useAuth } from "../hooks/useAuth";
-import "./Login.css";
+import "./AuthForm.css";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -27,6 +27,7 @@ export default function Signup() {
     const trimmedUsername = username.trim();
     const trimmedEmail = email.trim();
 
+    // Keep this rule in sync with USERNAME_PATTERN in the backend. The backend is the source of truth, but we can do a quick check here to avoid unnecessary requests.
     if (!/^[a-z0-9_.-]{3,30}$/i.test(trimmedUsername)) {
       setError(
         "Username must be 3–30 characters using letters, numbers, dots, underscores, or hyphens.",
