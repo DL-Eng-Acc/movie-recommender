@@ -4,6 +4,7 @@ import { Link, MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, it, expect } from "vitest";
 import App from "./App";
 import MovieDetail from "./pages/MovieDetail";
+import { AuthProvider } from "./context/AuthProvider";
 
 function savedFilters(): unknown {
   return JSON.parse(sessionStorage.getItem("movieSearchFilters") ?? "null");
@@ -21,9 +22,11 @@ describe("App filter persistence", () => {
     );
 
     render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     expect(screen.getByLabelText(/genre/i)).toHaveValue("28");
@@ -37,13 +40,15 @@ describe("App filter persistence", () => {
     const user = userEvent.setup();
 
     render(
-      <MemoryRouter initialEntries={["/"]}>
-        <Link to="/movie/574475">Open movie</Link>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-        </Routes>
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter initialEntries={["/"]}>
+          <Link to="/movie/574475">Open movie</Link>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await user.selectOptions(screen.getByLabelText(/genre/i), "28");

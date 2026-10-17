@@ -50,6 +50,15 @@ npm run dev
 ```
 The frontend server will be open on `localhost:5173` by default, while the backend server will be at `localhost:5000`.
 
+### User Accounts
+
+Use the **Register** link on the homepage or visit `/signup` to create an
+account. Existing users can select **Log in** or visit `/login`, using either their username or email address and password.
+
+After successful registration or login, the homepage displays the username and a **Log out** button. The application checks for an existing session when it loads, allowing users to remain logged in after refreshing.
+
+Account features require the backend to be running and connected to MongoDB. If the backend starts in degraded mode because MongoDB is unavailable, registration and login are unavailable.
+
 ## License
 `movie-recommender` is licensed under the [MIT License](LICENSE).
 

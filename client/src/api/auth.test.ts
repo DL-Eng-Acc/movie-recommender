@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 import { server } from "../test/server";
-import { getCurrentUser, requestLogout } from "./auth";
+import { getCurrentUser, requestLogin, requestLogout, requestSignup } from "./auth";
 import { apiFetch } from "./index";
 
 const BASE_URL =
@@ -137,5 +137,123 @@ describe("shared API helper", () => {
     expect(customHeader).toBe("example");
     expect(contentType).toBe("application/json");
     expect(body).toEqual({ value: 42 });
+  });
+});
+
+describe("login API", () => {
+  it("sends login details and includes browser credentials", async () => {
+    let receivedBody: unknown;
+    let credentials: RequestCredentials | undefined;
+    let contentType: string | null = null;
+
+    server.use(
+      http.post(`${BASE_URL}/auth/login`, async ({ request }) => {
+        receivedBody = await request.json();
+        credentials = request.credentials;
+        contentType = request.headers.get("Content-Type");
+
+        return HttpResponse.json({ user: testUser });
+      }),
+    );
+
+    await expect(
+      requestLogin({
+        identifier: "film_fan",
+        password: "example-password",
+      }),
+    ).resolves.toEqual(testUser);
+
+    expect(receivedBody).toEqual({
+      identifier: "film_fan",
+      password: "example-password",
+    });
+    expect(credentials).toBe("include");
+    expect(contentType).toBe("application/json");
+  });
+
+  it("propagates invalid-credentials errors", async () => {
+    server.use(
+      http.post(`${BASE_URL}/auth/login`, () =>
+        HttpResponse.json(
+          { message: "Invalid username/email or password" },
+          { status: 401 },
+        ),
+      ),
+    );
+
+    await expect(
+      requestLogin({
+        identifier: "film_fan",
+        password: "wrong-password",
+      }),
+    ).rejects.toThrow("Invalid username/email or password");
+  });
+
+  it("propagates database-unavailable errors", async () => {
+    server.use(
+      http.post(`${BASE_URL}/auth/login`, () =>
+        HttpResponse.json(
+          { message: "Authentication is unavailable" },
+          { status: 503 },
+        ),
+      ),
+    );
+
+    await expect(
+      requestLogin({
+        identifier: "film_fan",
+        password: "example-password",
+      }),
+    ).rejects.toThrow("Authentication is unavailable");
+  });
+});
+
+describe("signup API", () => {
+  it("sends account details with browser credentials", async () => {
+    let receivedBody: unknown;
+    let credentials: RequestCredentials | undefined;
+
+    server.use(
+      http.post(`${BASE_URL}/auth/signup`, async ({ request }) => {
+        receivedBody = await request.json();
+        credentials = request.credentials;
+
+        return HttpResponse.json({ user: testUser }, { status: 201 });
+      }),
+    );
+
+    await expect(
+      requestSignup({
+        username: "film_fan",
+        email: "film@example.com",
+        password: "example-password",
+      }),
+    ).resolves.toEqual(testUser);
+
+    expect(receivedBody).toEqual({
+      username: "film_fan",
+      email: "film@example.com",
+      password: "example-password",
+    });
+    expect(credentials).toBe("include");
+  });
+
+  it("propagates duplicate-account errors", async () => {
+    server.use(
+      http.post(`${BASE_URL}/auth/signup`, () =>
+        HttpResponse.json(
+          { message: "Username or email is already registered" },
+          { status: 409 },
+        ),
+      ),
+    );
+
+    await expect(
+      requestSignup({
+        username: "film_fan",
+        email: "film@example.com",
+        password: "example-password",
+      }),
+    ).rejects.toThrow("Username or email is already registered");
   });
 });

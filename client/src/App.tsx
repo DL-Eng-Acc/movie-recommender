@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./App.css";
 import SearchBar from "./components/SearchBar.tsx";
 import SearchResultsList from "./components/SearchResultsList.tsx";
@@ -9,12 +9,35 @@ import type { Movie } from "./types/movie.ts";
 import type { DiscoverFilters } from "./api/discoverMovies";
 import RandomButton from "./components/RandomButton.tsx";
 import { CURRENT_YEAR, MIN_YEAR } from "./constants/filters";
-import {
-  writeStoredFilters,
-  writeStoredQuery,
-} from "./utils/searchStorage";
+import { writeStoredFilters, writeStoredQuery } from "./utils/searchStorage";
+import { useAuth } from "./hooks/useAuth.ts";
 
 function App() {
+  const { user, isLoading: isAuthLoading, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setLogoutError(null);
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+    } catch (error: unknown) {
+      setLogoutError(
+        error instanceof Error
+          ? error.message
+          : "Unable to log out. Please try again.",
+      );
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
+
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
@@ -98,9 +121,47 @@ function App() {
     filters.castId !== undefined ||
     (filters.yearFrom !== undefined && filters.yearFrom !== MIN_YEAR) ||
     (filters.yearTo !== undefined && filters.yearTo !== CURRENT_YEAR);
+      let accountActions;
+
+  if (isAuthLoading) {
+    accountActions = <output>Checking your session…</output>;
+  } else if (user) {
+    accountActions = (
+      <>
+        <span>Hello, {user.username}</span>
+
+        <button
+          type="button"
+          className="login-link"
+          onClick={() => void handleLogout()}
+          disabled={isLoggingOut}
+        >
+          {isLoggingOut ? "Logging out…" : "Log out"}
+        </button>
+      </>
+    );
+  } else {
+    accountActions = (
+      <>
+        <Link to="/login" className="login-link">
+          Log in
+        </Link>
+
+        <Link to="/signup" className="login-link">
+          Register
+        </Link>
+      </>
+    );
+  }
 
   return (
     <section id="search-page">
+      <div className="account-actions">{accountActions}</div>
+      {logoutError && (
+        <p className="account-error" role="alert">
+          {logoutError}
+        </p>
+      )}
       <SearchBar
         onQueryChange={setQuery}
         isLoading={isLoading}

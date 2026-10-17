@@ -6,6 +6,7 @@ import { http, HttpResponse } from "msw";
 import App from "../App";
 import userEvent from "@testing-library/user-event";
 import LocationDisplay from "../test/LocationDisplay";
+import { AuthProvider } from "../context/AuthProvider";
 
 describe("MovieDetail", () => {
   afterEach(() => {
@@ -125,13 +126,15 @@ describe("MovieDetail", () => {
     const user = userEvent.setup();
 
     render(
-      <MemoryRouter initialEntries={["/", "/movie/574475"]} initialIndex={1}>
-        <LocationDisplay/>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-        </Routes>
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter initialEntries={["/", "/movie/574475"]} initialIndex={1}>
+          <LocationDisplay/>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+          </Routes>
+        </MemoryRouter>,
+      </AuthProvider>
     );
 
     await screen.findByText("Final Destination Bloodlines");
