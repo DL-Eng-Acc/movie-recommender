@@ -101,6 +101,8 @@
 .account-actions {
   display: flex;
   justify-content: flex-end;
+  padding-top: 1rem;
+  padding-right: 1rem;
   margin-bottom: 1rem;
 }
 
