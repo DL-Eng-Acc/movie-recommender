@@ -49,3 +49,35 @@
   outline: 2px solid #c8a96e;
   outline-offset: 3px;
 }
+
+.profile-logout {
+  display: block;
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #c8a96e;
+  border-radius: 0.75rem;
+  background-color: #c8a96e;
+  color: #0c0c0f;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-logout:hover:not(:disabled) {
+  background-color: #dbc08d;
+}
+
+.profile-logout:focus-visible {
+  outline: 2px solid #c8a96e;
+  outline-offset: 3px;
+}
+
+.profile-logout:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.profile-error {
+  color: #ffb4ab;
+}

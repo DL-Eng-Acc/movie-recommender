@@ -1,9 +1,34 @@
-import { Link, Navigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import "./Profile.css";
 
 export default function Profile() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setLogoutError(null);
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+      void navigate("/", { replace: true });
+    } catch (error: unknown) {
+      setLogoutError(
+        error instanceof Error
+          ? error.message
+          : "Unable to log out. Please try again.",
+      );
+      setIsLoggingOut(false);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -14,7 +39,7 @@ export default function Profile() {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={isLoggingOut ? "/" : "/login"} replace />;
   }
 
   return (
@@ -49,6 +74,20 @@ export default function Profile() {
         <h2 id="viewing-history-heading">Viewing history</h2>
         <p>Viewing history is coming soon.</p>
       </section>
+      {logoutError && (
+        <p className="profile-error" role="alert">
+            {logoutError}
+        </p>
+      )}
+
+      <button
+        type="button"
+        className="profile-logout"
+        onClick={() => void handleLogout()}
+        disabled={isLoggingOut}
+      >
+        {isLoggingOut ? "Logging out…" : "Log out"}
+      </button>
     </main>
   );
 }
