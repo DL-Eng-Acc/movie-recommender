@@ -9,6 +9,7 @@ import {
   RESULTS_FETCH_DEBOUNCE_MS,
   SEARCH_INPUT_DEBOUNCE_MS,
 } from "./constants/debounce";
+import { AuthProvider } from "./context/AuthProvider";
 
 // A title search waits on two debounces (SearchBar, then useMovieResults),
 // about 700ms in total. Waiting for those in real time left findBy*'s
@@ -44,9 +45,11 @@ async function searchFor(user: UserEvent, text: string) {
 
 function renderApp() {
   return render(
-    <MemoryRouter>
-      <App />
-    </MemoryRouter>,
+    <AuthProvider>
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    </AuthProvider>
   );
 }
 
@@ -117,13 +120,15 @@ describe("App search integration", () => {
     const user = setupUser();
 
     render(
-      <MemoryRouter initialEntries={["/"]}>
-        <LocationDisplay/>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-        </Routes>
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter initialEntries={["/"]}>
+          <LocationDisplay/>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
     );
 
     await searchFor(user, "Test");

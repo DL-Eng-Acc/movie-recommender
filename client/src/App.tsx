@@ -9,12 +9,35 @@ import type { Movie } from "./types/movie.ts";
 import type { DiscoverFilters } from "./api/discoverMovies";
 import RandomButton from "./components/RandomButton.tsx";
 import { CURRENT_YEAR, MIN_YEAR } from "./constants/filters";
-import {
-  writeStoredFilters,
-  writeStoredQuery,
-} from "./utils/searchStorage";
+import { writeStoredFilters, writeStoredQuery } from "./utils/searchStorage";
+import {useAuth} from "./hooks/useAuth.ts";
 
 function App() {
+  const { user, isLoading: isAuthLoading, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setLogoutError(null);
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+    } catch (error: unknown) {
+      setLogoutError(
+        error instanceof Error
+          ? error.message
+          : "Unable to log out. Please try again.",
+      );
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
+
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
@@ -102,13 +125,39 @@ function App() {
   return (
     <section id="search-page">
       <div className="account-actions">
-        <Link to="/login" className="login-link">
-          Log in
-        </Link>
-        <Link to="/signup" className="login-link">
-          Register
-        </Link>
+        {isAuthLoading ? (
+          <span role="status">Checking your session…</span>
+        ) : user ? (
+          <>
+            <span>Hello, {user.username}</span>
+
+            <button
+              type="button"
+              className="login-link"
+              onClick={() => void handleLogout()}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? "Logging out…" : "Log out"}
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="login-link">
+              Log in
+            </Link>
+
+            <Link to="/signup" className="login-link">
+              Register
+            </Link>
+          </>
+        )}
       </div>
+
+      {logoutError && (
+        <p className="account-error" role="alert">
+          {logoutError}
+        </p>
+      )}
       <SearchBar
         onQueryChange={setQuery}
         isLoading={isLoading}
