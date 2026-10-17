@@ -85,47 +85,41 @@ describe("Signup", () => {
     });
   });
 
-  it("rejects passwords that do not match without submitting", async () => {
-    let signupRequests = 0;
+  it.each([
+    {
+        scenario: "passwords that do not match",
+        password: "example-password",
+        confirmation: "different-password",
+        expectedMessage: "Passwords do not match.",
+    },
+    {
+        scenario: "short passwords",
+        password: "short",
+        confirmation: "short",
+        expectedMessage: "Password must be at least 8 characters",
+    },
+    ])(
+    "rejects $scenario without submitting",
+    async ({ password, confirmation, expectedMessage }) => {
+        let signupRequests = 0;
 
-    server.use(
-      http.post(`${BASE_URL}/auth/signup`, () => {
-        signupRequests += 1;
-        return HttpResponse.json({ user: testUser }, { status: 201 });
-      }),
-    );
+        server.use(
+        http.post(`${BASE_URL}/auth/signup`, () => {
+            signupRequests += 1;
+            return HttpResponse.json({ user: testUser }, { status: 201 });
+        }),
+        );
 
-    renderSignup();
-    const user = await fillForm("example-password", "different-password");
+        renderSignup();
 
-    await user.click(screen.getByRole("button", { name: "Register" }));
+        const user = await fillForm(password, confirmation);
+        await user.click(screen.getByRole("button", { name: "Register" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Passwords do not match.",
-    );
-    expect(signupRequests).toBe(0);
-  });
-
-  it("rejects short passwords without submitting", async () => {
-    let signupRequests = 0;
-
-    server.use(
-      http.post(`${BASE_URL}/auth/signup`, () => {
-        signupRequests += 1;
-        return HttpResponse.json({ user: testUser }, { status: 201 });
-      }),
-    );
-
-    renderSignup();
-    const user = await fillForm("short", "short");
-
-    await user.click(screen.getByRole("button", { name: "Register" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Password must be at least 8 characters",
-    );
-    expect(signupRequests).toBe(0);
-  });
+        expect(await screen.findByRole("alert")).toHaveTextContent(
+        expectedMessage,
+        );
+        expect(signupRequests).toBe(0);
+    },);
 
   it("shows duplicate-account errors and allows another attempt", async () => {
     server.use(
