@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./App.css";
 import SearchBar from "./components/SearchBar.tsx";
 import SearchResultsList from "./components/SearchResultsList.tsx";
@@ -101,6 +101,11 @@ function App() {
 
   return (
     <section id="search-page">
+      <div className="account-actions">
+        <Link to="/login" className="login-link">
+          Log in
+        </Link>
+      </div>
       <SearchBar
         onQueryChange={setQuery}
         isLoading={isLoading}

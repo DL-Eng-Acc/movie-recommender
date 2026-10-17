@@ -98,3 +98,27 @@
   max-height: 600px;
   opacity: 1;
 }
+.account-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.login-link {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  color: #0c0c0f;
+  background-color: #c8a96e;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  background-color: #dbc08d;
+}
+
+.login-link:focus-visible {
+  outline: 2px solid #c8a96e;
+  outline-offset: 3px;
+}
