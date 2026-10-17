@@ -12,7 +12,7 @@ describe("apiFetch", () => {
     await expect(apiFetch<{ id: number }>("/test")).resolves.toEqual({ id: 7 });
   });
 
-  it("sends a JSON content type and keeps headers the caller passes", async () => {
+  it("does not add a content type without a body and keeps caller headers", async () => {
     let received: Headers | undefined;
     server.use(
       http.get(ENDPOINT, ({ request }) => {
@@ -23,8 +23,45 @@ describe("apiFetch", () => {
 
     await apiFetch("/test", { headers: new Headers({ "X-Request-Id": "abc" }) });
 
-    expect(received?.get("Content-Type")).toBe("application/json");
+    expect(received?.get("Content-Type")).toBeNull();
     expect(received?.get("X-Request-Id")).toBe("abc");
+  });
+
+  it("adds a JSON content type when a body is provided", async () => {
+    let received: Headers | undefined;
+
+    server.use(
+      http.post(ENDPOINT, ({ request }) => {
+        received = request.headers;
+        return HttpResponse.json({});
+      }),
+    );
+
+    await apiFetch("/test", {
+      method: "POST",
+      body: JSON.stringify({ example: "value" }),
+    });
+
+    expect(received?.get("Content-Type")).toBe("application/json");
+  });
+
+  it("preserves an explicitly provided content type", async () => {
+    let received: Headers | undefined;
+
+    server.use(
+      http.post(ENDPOINT, ({ request }) => {
+        received = request.headers;
+        return HttpResponse.json({});
+      }),
+    );
+
+    await apiFetch("/test", {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: "Example text",
+    });
+
+    expect(received?.get("Content-Type")).toBe("text/plain");
   });
 
   it("throws the backend's error message", async () => {
