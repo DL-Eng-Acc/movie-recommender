@@ -8,6 +8,11 @@ import { useMovieResults } from "./hooks/useMovieResults.ts";
 import type { Movie } from "./types/movie.ts";
 import type { DiscoverFilters } from "./api/discoverMovies";
 import RandomButton from "./components/RandomButton.tsx";
+import { CURRENT_YEAR, MIN_YEAR } from "./constants/filters";
+import {
+  writeStoredFilters,
+  writeStoredQuery,
+} from "./utils/searchStorage";
 
 function App() {
   const [showFilters, setShowFilters] = useState(false);
@@ -20,7 +25,7 @@ function App() {
     }
 
     try {
-      const parsed = JSON.parse(savedQuery);
+      const parsed = JSON.parse(savedQuery) as unknown;
 
       if (typeof parsed === "string" && /^[^<>]*$/.test(parsed)) {
         return parsed;
@@ -38,7 +43,7 @@ function App() {
     }
 
     try {
-      const parsed = JSON.parse(savedFilters);
+      const parsed = JSON.parse(savedFilters) as Record<string, unknown>;
       const safeFilters: DiscoverFilters = {};
 
       if (typeof parsed.genre === "number") {
@@ -50,6 +55,9 @@ function App() {
       if (typeof parsed.yearTo === "number") {
         safeFilters.yearTo = parsed.yearTo;
       }
+      if (typeof parsed.language === "string") {
+        safeFilters.language = parsed.language;
+      }
       if (typeof parsed.ratingMin === "number") {
         safeFilters.ratingMin = parsed.ratingMin;
       }
@@ -57,8 +65,8 @@ function App() {
         safeFilters.castId = parsed.castId;
       }
 
-      if (["popularity", "rating", "release_date"].includes(parsed.sort)) {
-        safeFilters.sort = parsed.sort;
+      if (typeof parsed.sort === "string" && ["popularity", "rating", "release_date"].includes(parsed.sort)) {
+        safeFilters.sort = parsed.sort as DiscoverFilters["sort"];
       }
 
       return safeFilters;
@@ -73,26 +81,23 @@ function App() {
   );
 
   useEffect(() => {
-    if (/^[^<>]*$/.test(query)) {
-      sessionStorage.setItem("movieSearchQuery", JSON.stringify(query));
-    }
+    writeStoredQuery(query);
   }, [query]);
 
   useEffect(() => {
-    sessionStorage.setItem("movieSearchFilters", JSON.stringify(filters));
+    writeStoredFilters(filters);
   }, [filters]);
 
   const handleMovieClick = (movie: Movie) => {
-    navigate(`/movie/${movie.id}`);
+    void navigate(`/movie/${movie.id}`);
   };
 
   const hasActiveFilters =
     filters.genre !== undefined ||
     filters.ratingMin !== undefined ||
     filters.castId !== undefined ||
-    (filters.yearFrom !== undefined && filters.yearFrom !== 1900) ||
-    (filters.yearTo !== undefined &&
-      filters.yearTo !== new Date().getFullYear());
+    (filters.yearFrom !== undefined && filters.yearFrom !== MIN_YEAR) ||
+    (filters.yearTo !== undefined && filters.yearTo !== CURRENT_YEAR);
 
   return (
     <section id="search-page">

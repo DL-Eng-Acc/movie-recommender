@@ -26,11 +26,11 @@ default: ({
         
         const fakeCtx = {
             // spied fields used in constructor - required
-            beginPath: vi.fn(),
-            arc: vi.fn(),
-            fill: vi.fn(),
-            stroke: vi.fn(),
-            fillText: vi.fn(),
+            beginPath: vi.fn<CanvasRenderingContext2D["beginPath"]>(),
+            arc: vi.fn<CanvasRenderingContext2D["arc"]>(),
+            fill: vi.fn<() => void>(),
+            stroke: vi.fn<() => void>(),
+            fillText: vi.fn<CanvasRenderingContext2D["fillText"]>(),
             font: "",
             textAlign: "",
             textBaseline: "",
