@@ -7,6 +7,7 @@ import MovieDetail from "./pages/MovieDetail.tsx";
 import { AuthProvider } from "./context/AuthProvider.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
+import Profile from "./pages/Profile.tsx";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -22,6 +23,7 @@ createRoot(rootElement).render(
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

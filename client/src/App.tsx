@@ -129,7 +129,9 @@ function App() {
     accountActions = (
       <>
         <span>Hello, {user.username}</span>
-
+        <Link to="/profile" className="login-link">
+          Profile
+        </Link>
         <button
           type="button"
           className="login-link"
