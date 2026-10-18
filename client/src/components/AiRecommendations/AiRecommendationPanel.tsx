@@ -1,4 +1,4 @@
-import { useEffect, useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAiRecommendations } from "../../hooks/useAiRecommendations";
 import "./AiRecommendationPanel.css";
@@ -20,6 +20,28 @@ export default function AiRecommendationPanel({ movieId, title, year }: Readonly
     year,
   );
   const headingId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const retryButtonRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
+
+  // Focus management for keyboard and screen-reader users: move focus into the card
+  // when it opens, and hand it back to the trigger button when it closes.
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus();
+    } else if (wasOpenRef.current) {
+      triggerRef.current?.focus();
+    }
+    wasOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  // After an error, put focus on "Try again" so the user can retry straight away.
+  useEffect(() => {
+    if (isOpen && status === "error") {
+      retryButtonRef.current?.focus();
+    }
+  }, [isOpen, status]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -36,7 +58,7 @@ export default function AiRecommendationPanel({ movieId, title, year }: Readonly
   return (
     <div className="ai-panel">
       {!isOpen && (
-        <button type="button" className="ai-panel__trigger" onClick={open}>
+        <button ref={triggerRef} type="button" className="ai-panel__trigger" onClick={open}>
           <span aria-hidden="true">✦</span> {buttonLabel}
         </button>
       )}
@@ -48,6 +70,7 @@ export default function AiRecommendationPanel({ movieId, title, year }: Readonly
               <span aria-hidden="true">✦</span> AI picks for you
             </h3>
             <button
+              ref={closeButtonRef}
               type="button"
               className="ai-panel__close"
               onClick={close}
@@ -58,7 +81,7 @@ export default function AiRecommendationPanel({ movieId, title, year }: Readonly
           </header>
 
           {status === "loading" && (
-            <div className="ai-panel__loading" role="status">
+            <div className="ai-panel__loading" role="status" aria-live="polite">
               <span className="ai-panel__spinner" aria-hidden="true" />
               Thinking about what you might like…
             </div>
@@ -67,7 +90,12 @@ export default function AiRecommendationPanel({ movieId, title, year }: Readonly
           {status === "error" && (
             <div className="ai-panel__error" role="alert">
               <p>{error}</p>
-              <button type="button" className="ai-panel__retry" onClick={retry}>
+              <button
+                ref={retryButtonRef}
+                type="button"
+                className="ai-panel__retry"
+                onClick={retry}
+              >
                 Try again
               </button>
             </div>

@@ -216,6 +216,41 @@ describe("AiRecommendationPanel", () => {
     );
   });
 
+  it("moves focus to the close button when opened and back to the trigger when closed", async () => {
+    mockAi();
+    renderPanel();
+
+    await userEvent.click(openButton());
+    expect(screen.getByRole("button", { name: /close ai recommendations/i })).toHaveFocus();
+
+    await screen.findByTestId("ai-summary");
+    await userEvent.keyboard("{Escape}");
+
+    expect(openButton()).toHaveFocus();
+  });
+
+  it("announces the loading state politely to screen readers", async () => {
+    mockAi(async () => {
+      await delay(50);
+      return HttpResponse.json(aiResponse);
+    });
+    renderPanel();
+
+    await userEvent.click(openButton());
+
+    expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
+  });
+
+  it("focuses the retry button after an error so it can be used from the keyboard", async () => {
+    mockAi(() => new HttpResponse(null, { status: 500 }));
+    renderPanel();
+
+    await userEvent.click(openButton());
+    await screen.findByRole("alert");
+
+    expect(screen.getByRole("button", { name: /try again/i })).toHaveFocus();
+  });
+
   it("ignores a slow response for the previous movie", async () => {
     mockAi(async () => {
       await delay(100);
